@@ -89,6 +89,18 @@ show_reading_time: false
     color: var(--pwc-white);
   }
 
+  /* Profile button gets a sage tint to stand apart */
+  .pwc-btn-profile {
+    background: none;
+    color: var(--pwc-sage-dark);
+    border: 1.5px solid var(--pwc-sage);
+  }
+
+  .pwc-btn-profile:hover {
+    background: var(--pwc-sage);
+    color: var(--pwc-white);
+  }
+
   .pwc-section {
     padding: 3rem 2rem;
     max-width: 860px;
@@ -218,6 +230,8 @@ show_reading_time: false
     .pwc-fact { background: #222; border-color: #3a3438; }
     .pwc-btn-border { color: var(--pwc-rose-light); border-color: var(--pwc-rose-light); }
     .pwc-btn-border:hover { background: var(--pwc-rose-light); color: var(--pwc-charcoal); }
+    .pwc-btn-profile { color: #b8d4a8; border-color: #7a8e6b; }
+    .pwc-btn-profile:hover { background: #7a8e6b; color: #fff; }
   }
 </style>
 
@@ -227,6 +241,7 @@ show_reading_time: false
   <div class="pwc-hero-links">
     <a href="{{ site.baseurl }}/navigation/about" class="pwc-btn pwc-btn-fill">About Us</a>
     <a href="{{ site.baseurl }}/navigation/events" class="pwc-btn pwc-btn-border">Events</a>
+    <a href="{{ site.baseurl }}/navigation/profile" class="pwc-btn pwc-btn-profile">My Profile</a>
   </div>
 </div>
 

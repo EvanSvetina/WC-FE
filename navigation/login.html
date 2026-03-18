@@ -1,0 +1,68 @@
+---
+layout: default
+title: Member Login
+hide: true
+show_reading_time: false
+---
+
+<link rel="stylesheet" href="{{ site.baseurl }}/assets/css/login.css">
+
+<div class="pwc-login-page">
+  <div class="login-card">
+
+    <!-- Brand -->
+    <div class="login-brand">
+      <div class="login-emblem">PWC</div>
+      <h1>Member Login</h1>
+      <p>Poway Woman's Club — Members Area</p>
+    </div>
+
+    <hr class="login-divider">
+
+    <!-- Alert -->
+    <div class="login-alert" id="loginAlert" role="alert"></div>
+
+    <!-- Fields -->
+    <div class="login-fields">
+      <div class="login-field">
+        <label for="username">Username</label>
+        <input
+          class="form__input"
+          type="text"
+          id="username"
+          placeholder="your.username"
+          autocomplete="username"
+          autocapitalize="none"
+          spellcheck="false"
+        >
+      </div>
+
+      <div class="login-field">
+        <label for="password">Password</label>
+        <div class="login-pw-wrap">
+          <input
+            class="form__input"
+            type="password"
+            id="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+          >
+          <button class="login-pw-toggle" id="pwToggle" type="button" aria-label="Show password">👁</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="login-actions">
+      <button class="btn btn__primary" id="loginBtn" type="button">Sign In</button>
+      <a class="btn btn__secondary" href="{{ site.baseurl }}/">← Back to Home</a>
+    </div>
+
+    <div class="login-back">
+      Not a member? <a href="{{ site.baseurl }}/navigation/contact">Contact us to join</a>
+    </div>
+
+  </div>
+</div>
+
+<script src="{{ site.baseurl }}/assets/js/login.js"></script>
