@@ -28,6 +28,15 @@ minima:
     - navigation/blog.md
     - navigation/contact.md
 
+# Event scheduling / signup endpoints.
+# These are typically Formspree/Google Forms URLs. Leave blank to disable submission.
+events_rsvp_form_action: ""
+events_meeting_request_form_action: ""
+
+# Public API base URL for calendar/RSVP interactions (Flask backend).
+# Example: "http://localhost:5001"
+events_api_base_url: "http://localhost:5001"
+
 exclude:
   - venv
   - venv/**

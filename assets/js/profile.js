@@ -246,6 +246,13 @@
   });
 
   el('logoutBtn').addEventListener('click', function () {
+    // Best-effort backend logout (keeps server session from persisting).
+    try {
+      var api = (window.PWC_API_BASE_URL || '').replace(/\/$/, '');
+      if (api) {
+        fetch(api + '/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(function () {});
+      }
+    } catch (_) {}
     sessionStorage.removeItem('pwc_user');
     window.location.href = (window.PWC_BASE || '/wc-FE') + '/navigation/login';
   });

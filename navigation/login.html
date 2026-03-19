@@ -65,4 +65,8 @@ show_reading_time: false
   </div>
 </div>
 
+<script>
+  // Used by assets/js/login.js to call the backend auth API.
+  window.PWC_API_BASE_URL = "{{ site.events_api_base_url | escape }}";
+</script>
 <script src="{{ site.baseurl }}/assets/js/login.js"></script>

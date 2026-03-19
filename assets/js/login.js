@@ -26,6 +26,9 @@
   // Base URL — matches _config.yml baseurl
   var BASE = '/wc-FE';
 
+  // Backend API base URL (Flask server)
+  var API_BASE_URL = (window.PWC_API_BASE_URL || 'http://localhost:5001').replace(/\/$/, '');
+
   // Where to send the user after a successful login
   var REDIRECT_AFTER_LOGIN = BASE + '/navigation/profile';
 
@@ -94,19 +97,42 @@
    *   });
    */
   function attemptLogin(username, password) {
-    return new Promise(function (resolve, reject) {
-      // Simulate a small network delay
-      setTimeout(function () {
-        var user = DEMO_USERS[username.toLowerCase()];
-        if (!user || user.password !== password) {
-          reject('Invalid username or password. Please try again.');
-          return;
+    return fetch(API_BASE_URL + '/api/auth/login', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: username, password: password })
+    }).then(function (res) {
+      return res.text().then(function (t) {
+        var data = {};
+        try { data = t ? JSON.parse(t) : {}; } catch (_) {}
+        if (!res.ok) {
+          var msg = (data && data.error) ? data.error : 'Invalid username or password.';
+          throw new Error(msg);
         }
-        // Return a copy without the password field
-        var safe = Object.assign({}, user);
-        delete safe.password;
-        resolve(safe);
-      }, 400);
+        // Backend returns {id, username, email, role, ...}
+        var user = data || {};
+        var u = String(user.username || username || '');
+        var firstName = u;
+        var lastName = '';
+        if (u && u !== 'admin') {
+          var segs = u.split(/[\\._-]/);
+          firstName = segs[0] || u;
+          lastName = segs[1] || '';
+        }
+
+        // Map into the shape profile.js expects.
+        return {
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          firstName: firstName,
+          lastName: lastName,
+          bio: user.bio || '',
+          languages: [],
+          interests: []
+        };
+      });
     });
   }
 
