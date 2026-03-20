@@ -24,7 +24,7 @@ minima:
   nav_pages:
     - navigation/about.md
     - navigation/events.md
-    - navigation/blog.md
+    - navigation/blog.html
     - navigation/contact.md
 
 # Event scheduling / signup endpoints.

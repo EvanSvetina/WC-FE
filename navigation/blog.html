@@ -1,0 +1,99 @@
+---
+layout: default
+title: Blog
+permalink: /navigation/blog/
+---
+
+<div class="pwc-blog-page">
+
+  <!-- ── Header ── -->
+  <div class="pwc-blog-header">
+    <div class="pwc-blog-header-text">
+      <h1>Club Blog</h1>
+      <p>News, recaps, spotlights, and community updates from our members.</p>
+    </div>
+    <button class="pwc-btn pwc-btn-sage pwc-blog-new-btn" id="blog-new-btn" style="display:none;" onclick="Blog.showCompose()">
+      + New Post
+    </button>
+  </div>
+
+  <!-- ── Search & Filters ── -->
+  <div class="pwc-blog-toolbar">
+    <div class="pwc-blog-search-wrap">
+      <svg class="pwc-blog-search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="blog-search" class="pwc-blog-search" placeholder="Search posts..." autocomplete="off">
+    </div>
+    <div class="pwc-blog-filters">
+      <select id="blog-filter-author" class="pwc-blog-select">
+        <option value="">All Authors</option>
+      </select>
+      <button class="pwc-blog-filter-btn" id="blog-filter-pinned" title="Show pinned only">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 L12 12 M12 12 L17 7 M12 12 L7 7 M5 22 L19 22 M12 12 L12 22"/></svg>
+        Pinned
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Post List ── -->
+  <div id="blog-posts" class="pwc-blog-list">
+    <div class="pwc-blog-loading">Loading posts...</div>
+  </div>
+
+  <!-- ── Pagination ── -->
+  <div id="blog-pagination" class="pwc-blog-pagination" style="display:none;"></div>
+
+  <!-- ── Compose / Edit Overlay ── -->
+  <div id="blog-compose-overlay" class="pwc-blog-overlay" style="display:none;">
+    <div class="pwc-blog-compose-card">
+      <div class="pwc-blog-compose-header">
+        <h2 id="blog-compose-title">New Post</h2>
+        <button class="pwc-blog-close" onclick="Blog.hideCompose()">&times;</button>
+      </div>
+      <form id="blog-compose-form" onsubmit="Blog.submitPost(event)">
+        <input type="hidden" id="blog-edit-id" value="">
+        <div class="pwc-blog-field">
+          <label for="blog-post-title">Title</label>
+          <input type="text" id="blog-post-title" required maxlength="255" placeholder="Give your post a title...">
+        </div>
+        <div class="pwc-blog-field">
+          <label for="blog-post-body">Body</label>
+          <textarea id="blog-post-body" required rows="10" placeholder="Write your post here..."></textarea>
+        </div>
+        <div class="pwc-blog-compose-actions">
+          <button type="button" class="pwc-btn pwc-btn-muted" onclick="Blog.hideCompose()">Cancel</button>
+          <button type="submit" class="pwc-btn pwc-btn-sage" id="blog-submit-btn">Publish</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Single Post Detail Overlay ── -->
+  <div id="blog-detail-overlay" class="pwc-blog-overlay" style="display:none;">
+    <div class="pwc-blog-detail-card">
+      <button class="pwc-blog-back" onclick="Blog.hideDetail()">← Back to posts</button>
+      <div id="blog-detail-content"></div>
+    </div>
+  </div>
+
+  <!-- ── Pin Modal (admin) ── -->
+  <div id="blog-pin-overlay" class="pwc-blog-overlay" style="display:none;">
+    <div class="pwc-blog-pin-card">
+      <h3>Pin Post</h3>
+      <p>How long should this post stay pinned?</p>
+      <input type="hidden" id="blog-pin-post-id">
+      <div class="pwc-blog-pin-options">
+        <button class="pwc-btn pwc-btn-sage" onclick="Blog.pinPost(0)">Indefinitely</button>
+        <button class="pwc-btn pwc-btn-border" onclick="Blog.pinPost(7)">7 days</button>
+        <button class="pwc-btn pwc-btn-border" onclick="Blog.pinPost(14)">14 days</button>
+        <button class="pwc-btn pwc-btn-border" onclick="Blog.pinPost(30)">30 days</button>
+      </div>
+      <button class="pwc-btn pwc-btn-muted" onclick="Blog.hidePinModal()" style="margin-top:0.75rem;width:100%;">Cancel</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var API = "{{ site.events_api_base_url | escape }}";
+</script>
+<script src="{{ '/assets/js/blog.js' | relative_url }}"></script>
