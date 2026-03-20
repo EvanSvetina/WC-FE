@@ -1,7 +1,9 @@
 ---
-layout: page
+# Use default layout (not `page`) so content is not trapped in `.post-content` (720px column).
+layout: default
 title: Events
 permalink: /navigation/events/
+show_reading_time: false
 ---
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css">
 
@@ -811,7 +813,9 @@ permalink: /navigation/events/
         contentHeight: "auto",
         expandRows: true,
         fixedWeekCount: false,
-        dayMaxEventRows: 2,
+        /* Allow more rows + wrapped titles (see pwc.css); avoids single-line truncation */
+        dayMaxEventRows: 5,
+        eventDisplay: "block",
         headerToolbar: { left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek" },
         selectable: false,
         editable: false,

@@ -202,9 +202,20 @@ body {
 .page-content > .wrapper:has(#pwc-auth-gate),
 .page-content > .wrapper:has(.pwc-login-page),
 .page-content > .wrapper:has(.events-full-width) {
-  max-width: none;
+  max-width: none !important;
+  width: 100% !important;
   padding-left: 0;
   padding-right: 0;
+}
+
+/* If Events is ever switched back to `layout: page`, break out of the 720px article column */
+.post-content:has(.events-full-width) {
+  max-width: none !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 /* Prevent page scroll when profile app (messages) is active */
@@ -1689,6 +1700,16 @@ code, pre {
 /* ─── 7. EVENTS / FULLCALENDAR ─────────────────────────────────────────────── */
 
 /* Events page uses full-width sections */
+.events-full-width {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  /* Edge padding so calendar isn’t flush against the viewport on wide screens */
+  padding-left: clamp(0.75rem, 2.5vw, 2rem);
+  padding-right: clamp(0.75rem, 2.5vw, 2rem);
+  padding-bottom: 2rem;
+}
+
 .events-full-width .pwc-section {
   max-width: none;
   margin: 0;
@@ -1780,6 +1801,38 @@ code, pre {
 #pwc-events-calendar .fc .fc-event {
   border-radius: 10px !important;
   padding: 2px 6px;
+}
+
+/* Month view: show full titles (wrap) instead of “10:00 AM Ge…” truncation */
+#pwc-events-calendar .fc-daygrid-day-events {
+  margin-bottom: 2px;
+}
+#pwc-events-calendar .fc-daygrid-day-events,
+#pwc-events-calendar .fc-daygrid-event-harness {
+  overflow: visible !important;
+}
+#pwc-events-calendar .fc-daygrid-event,
+#pwc-events-calendar .fc-daygrid-event .fc-event-main,
+#pwc-events-calendar .fc-daygrid-event .fc-event-title {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+#pwc-events-calendar .fc-daygrid-event .fc-event-title {
+  font-size: 0.72rem;
+  line-height: 1.25;
+  word-break: break-word;
+  display: block;
+}
+#pwc-events-calendar .fc .fc-daygrid-day-frame {
+  min-height: 112px;
+}
+/* Visual hint: empty day cells are clickable (schedule meeting) */
+#pwc-events-calendar .fc-daygrid-day:not(.fc-day-other) {
+  cursor: pointer;
+}
+#pwc-events-calendar .fc-daygrid-day:not(.fc-day-other):hover {
+  background: rgba(196, 120, 138, 0.09) !important;
 }
 
 /* ─── 7b. BLOG ─────────────────────────────────────────────────────────────── */
