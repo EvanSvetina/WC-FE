@@ -15,7 +15,7 @@ var BlogAPI = (function () {
   }
 
   function getPosts(params) {
-    return fetch(API_BASE + "/posts?" + params.toString())
+    return fetch(API_BASE + "/posts?" + params.toString(), { credentials: "include" })
       .then(function (r) {
         if (!r.ok) throw new Error("Failed to load posts");
         return r.json();
@@ -30,24 +30,27 @@ var BlogAPI = (function () {
       });
   }
 
-  function createPost(title, body) {
+  function createPost(title, body, groupId) {
+    var payload = { title: title, body: body };
+    if (groupId) payload.group_id = groupId;
     return fetch(API_BASE + "/posts", {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: title, body: body }),
+      body: JSON.stringify(payload),
     }).then(function (r) {
       if (!r.ok) return r.json().then(function (d) { throw new Error(d.error || "Failed"); });
       return r.json();
     });
   }
 
-  function updatePost(id, title, body) {
+  function updatePost(id, title, body, groupId) {
+    var payload = { title: title, body: body, group_id: groupId || null };
     return fetch(API_BASE + "/posts/" + id, {
       method: "PUT",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: title, body: body }),
+      body: JSON.stringify(payload),
     }).then(function (r) {
       if (!r.ok) return r.json().then(function (d) { throw new Error(d.error || "Failed"); });
       return r.json();

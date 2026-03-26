@@ -59,6 +59,12 @@ permalink: /navigation/blog/
           <label for="blog-post-body">Body</label>
           <textarea id="blog-post-body" required rows="10" placeholder="Write your post here..."></textarea>
         </div>
+        <div class="pwc-blog-field">
+          <label for="blog-post-group">Visibility</label>
+          <select id="blog-post-group" class="pwc-blog-select">
+            <option value="">Public (visible to all)</option>
+          </select>
+        </div>
         <div class="pwc-blog-compose-actions">
           <button type="button" class="pwc-btn pwc-btn-muted" onclick="Blog.hideCompose()">Cancel</button>
           <button type="submit" class="pwc-btn pwc-btn-sage" id="blog-submit-btn">Publish</button>
@@ -96,6 +102,7 @@ permalink: /navigation/blog/
 <script>
 var API = "{{ site.events_api_base_url | escape }}";
 </script>
-<script src="{{ '/assets/js/blog-api.js'      | relative_url }}"></script>
+<script src="{{ '/assets/js/group-api.js'      | relative_url }}"></script>
+<script src="{{ '/assets/js/blog-api.js'       | relative_url }}"></script>
 <script src="{{ '/assets/js/blog-renderer.js'  | relative_url }}"></script>
 <script src="{{ '/assets/js/blog.js'           | relative_url }}"></script>

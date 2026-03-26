@@ -44,6 +44,9 @@ var BlogRenderer = (function () {
       var pinBadge = p.is_pinned
         ? '<span class="pwc-blog-pin-badge">📌 Pinned</span>'
         : "";
+      var groupBadge = p.group_name
+        ? '<span class="pwc-blog-group-badge">' + escapeHtml(p.group_name) + '</span>'
+        : "";
       var preview = p.body.length > 200 ? p.body.substring(0, 200) + "..." : p.body;
       var date    = formatDate(p.created_at);
 
@@ -66,7 +69,7 @@ var BlogRenderer = (function () {
 
       html += '<article class="pwc-blog-card' + (p.is_pinned ? ' pwc-blog-card--pinned' : '') + '" onclick="Blog.openPost(' + p.id + ')">'
         + '<div class="pwc-blog-card-top">'
-        +   pinBadge
+        +   pinBadge + groupBadge
         +   '<div class="pwc-blog-card-admin">' + editBtn + adminBtns + '</div>'
         + '</div>'
         + '<h2 class="pwc-blog-card-title">'   + escapeHtml(p.title)             + '</h2>'
@@ -107,11 +110,12 @@ var BlogRenderer = (function () {
   function renderPostDetail(post, currentUser) {
     var content  = document.getElementById("blog-detail-content");
     var date     = formatDate(post.created_at);
-    var pinLabel = post.is_pinned ? '<span class="pwc-blog-pin-badge">📌 Pinned</span>' : "";
-    var bodyHtml = escapeHtml(post.body).replace(/\n/g, "<br>");
+    var pinLabel   = post.is_pinned ? '<span class="pwc-blog-pin-badge">📌 Pinned</span>' : "";
+    var groupLabel = post.group_name ? '<span class="pwc-blog-group-badge">' + escapeHtml(post.group_name) + '</span>' : "";
+    var bodyHtml   = escapeHtml(post.body).replace(/\n/g, "<br>");
 
     var html = '<article class="pwc-blog-detail">'
-      + pinLabel
+      + pinLabel + groupLabel
       + '<h1>'                        + escapeHtml(post.title)             + '</h1>'
       + '<div class="pwc-blog-detail-meta">'
       +   '<span>By <strong>'         + escapeHtml(post.author || "Unknown") + '</strong></span>'

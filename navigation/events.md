@@ -20,6 +20,13 @@ show_reading_time: false
   <hr class="pwc-rule" />
   <p>Interactive calendar for Regular Meetings. Click an event to RSVP. Click a date to schedule a meeting.</p>
 
+  <div id="pwc-events-group-filter" class="pwc-events-filter-bar" style="display:none;">
+    <label for="pwc-events-group-select" style="font-weight:600; font-size:0.9rem; color:var(--pwc-muted);">Filter by group:</label>
+    <select id="pwc-events-group-select" class="pwc-blog-select" style="max-width:220px;">
+      <option value="">All Events</option>
+    </select>
+  </div>
+
   <div id="pwc-events-calendar" aria-label="Events calendar"></div>
 
 <div id="pwc-rsvp-backdrop" class="pwc-modal-backdrop" hidden></div>
@@ -234,6 +241,9 @@ show_reading_time: false
       return API_BASE_URL.replace(/\/$/, "") + path;
     }
 
+    var myGroupIds = [];
+    var selectedGroupFilter = "";
+
     var authCache = { status: "unknown", user: null };
 
     async function getCurrentUser() {
@@ -322,18 +332,34 @@ show_reading_time: false
         if (!Array.isArray(list)) return [];
 
         return list.map(function (e) {
+          var isGroupEvent = !!(e.group_id);
+          var isMemberGroup = isGroupEvent && myGroupIds.indexOf(e.group_id) !== -1;
+
+          // Gold highlight for group events the user belongs to
+          var bgColor    = "rgba(122, 142, 107, 0.28)";
+          var bdrColor   = "rgba(122, 142, 107, 0.85)";
+          if (isGroupEvent && isMemberGroup) {
+            bgColor  = "rgba(201, 160, 112, 0.35)";
+            bdrColor = "rgba(201, 160, 112, 0.90)";
+          } else if (isGroupEvent) {
+            bgColor  = "rgba(196, 120, 138, 0.22)";
+            bdrColor = "rgba(196, 120, 138, 0.70)";
+          }
+
           return {
             id: e.id,
-            title: e.title,
+            title: e.group_name ? e.title + " [" + e.group_name + "]" : e.title,
             start: e.start_time,
             end: e.end_time,
             allDay: false,
-            backgroundColor: "rgba(122, 142, 107, 0.28)",
-            borderColor: "rgba(122, 142, 107, 0.85)",
+            backgroundColor: bgColor,
+            borderColor: bdrColor,
             textColor: "#fbf8f6",
             extendedProps: {
               backendEventId: e.id,
-              location: e.location || ""
+              location: e.location || "",
+              groupId: e.group_id || null,
+              groupName: e.group_name || ""
             }
           };
         });
@@ -860,7 +886,13 @@ show_reading_time: false
           var base = buildRegularMeetings();
           loadBackendEvents()
             .then(function (apiEvents) {
-              successCallback(base.concat(apiEvents));
+              var filtered = apiEvents;
+              if (selectedGroupFilter) {
+                filtered = apiEvents.filter(function (ev) {
+                  return ev.extendedProps && String(ev.extendedProps.groupId) === selectedGroupFilter;
+                });
+              }
+              successCallback(base.concat(filtered));
             })
             .catch(function () {
               successCallback(base);
@@ -872,9 +904,45 @@ show_reading_time: false
       calendarInstance = calendar;
     }
 
+    function initGroupFilter() {
+      getCurrentUser().then(function (me) {
+        if (!me || !API_BASE_URL) return;
+
+        // Load user's groups to populate the filter dropdown
+        fetch(apiUrl("/api/groups/my"), { credentials: "include" })
+          .then(function (r) { return r.ok ? r.json() : []; })
+          .then(function (groups) {
+            myGroupIds = groups.map(function (g) { return g.id; });
+
+            if (groups.length === 0) return;
+
+            var filterBar = $("pwc-events-group-filter");
+            var sel = $("pwc-events-group-select");
+            if (!filterBar || !sel) return;
+
+            filterBar.style.display = "flex";
+            groups.forEach(function (g) {
+              var opt = document.createElement("option");
+              opt.value = String(g.id);
+              opt.textContent = g.name;
+              sel.appendChild(opt);
+            });
+
+            sel.addEventListener("change", function () {
+              selectedGroupFilter = sel.value;
+              if (calendarInstance && calendarInstance.refetchEvents) {
+                calendarInstance.refetchEvents();
+              }
+            });
+          })
+          .catch(function () {});
+      });
+    }
+
     function init() {
       initForms();
       initModal();
+      initGroupFilter();
       initCalendar();
     }
 

@@ -143,6 +143,33 @@
       el("ov-bio").textContent         = user.bio   || "—";
       renderTagList("ov-languages", user.languages || [], false);
       renderTagList("ov-interests", user.interests  || [], true);
+      loadUserGroups();
+    }
+
+    function loadUserGroups() {
+      var container = el("ov-groups");
+      if (!container) return;
+      if (typeof GroupAPI === "undefined") {
+        container.innerHTML = '<span style="font-size:0.82rem;color:var(--pwc-muted)">—</span>';
+        return;
+      }
+      GroupAPI.getMyGroups()
+        .then(function (groups) {
+          if (!groups || !groups.length) {
+            container.innerHTML = '<span style="font-size:0.82rem;color:var(--pwc-muted)">No groups joined yet</span>';
+            return;
+          }
+          container.innerHTML = "";
+          groups.forEach(function (g) {
+            var span = document.createElement("span");
+            span.className   = "pwc-tag";
+            span.textContent = g.name;
+            container.appendChild(span);
+          });
+        })
+        .catch(function () {
+          container.innerHTML = '<span style="font-size:0.82rem;color:var(--pwc-muted)">—</span>';
+        });
     }
 
     /* ── Edit form — tag chips ──────────────────────────────────────────── */

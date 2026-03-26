@@ -1,0 +1,65 @@
+---
+layout: default
+title: Groups
+permalink: /navigation/groups/
+---
+
+<div class="pwc-groups-page">
+
+  <!-- ── Header ── -->
+  <div class="pwc-blog-header">
+    <div class="pwc-blog-header-text">
+      <h1>Groups</h1>
+      <p>Join groups to connect with members who share your interests and see group-exclusive content.</p>
+    </div>
+    <button class="pwc-btn pwc-btn-sage pwc-blog-new-btn" id="groups-new-btn" style="display:none;" onclick="Groups.showCreate()">
+      + New Group
+    </button>
+  </div>
+
+  <!-- ── Group List ── -->
+  <div id="groups-list" class="pwc-groups-list">
+    <div class="pwc-blog-loading">Loading groups...</div>
+  </div>
+
+  <!-- ── Create / Edit Overlay ── -->
+  <div id="groups-compose-overlay" class="pwc-blog-overlay" style="display:none;">
+    <div class="pwc-blog-compose-card">
+      <div class="pwc-blog-compose-header">
+        <h2 id="groups-compose-title">New Group</h2>
+        <button class="pwc-blog-close" onclick="Groups.hideCompose()">&times;</button>
+      </div>
+      <form id="groups-compose-form" onsubmit="Groups.submitGroup(event)">
+        <input type="hidden" id="groups-edit-id" value="">
+        <div class="pwc-blog-field">
+          <label for="groups-name">Group Name</label>
+          <input type="text" id="groups-name" required maxlength="120" placeholder="Give your group a name...">
+        </div>
+        <div class="pwc-blog-field">
+          <label for="groups-desc">Description</label>
+          <textarea id="groups-desc" rows="4" placeholder="Describe what this group is about..."></textarea>
+        </div>
+        <div class="pwc-blog-compose-actions">
+          <button type="button" class="pwc-btn pwc-btn-muted" onclick="Groups.hideCompose()">Cancel</button>
+          <button type="submit" class="pwc-btn pwc-btn-sage" id="groups-submit-btn">Create Group</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Group Detail Overlay ── -->
+  <div id="groups-detail-overlay" class="pwc-blog-overlay" style="display:none;">
+    <div class="pwc-blog-detail-card">
+      <button class="pwc-blog-back" onclick="Groups.hideDetail()">&#8592; Back to groups</button>
+      <div id="groups-detail-content"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var API = "{{ site.events_api_base_url | escape }}";
+</script>
+<script src="{{ '/assets/js/group-api.js'      | relative_url }}"></script>
+<script src="{{ '/assets/js/group-renderer.js'  | relative_url }}"></script>
+<script src="{{ '/assets/js/groups.js'          | relative_url }}"></script>

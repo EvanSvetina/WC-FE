@@ -2482,3 +2482,194 @@ code, pre {
   .pwc-banner { background: #1a1618; border-color: #3a3438; }
   .pwc-banner-text { color: #c4bcbe; }
 }
+
+/* ─── GROUPS ──────────────────────────────────────────────────────────────── */
+
+.pwc-groups-page {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1.25rem;
+}
+
+.pwc-groups-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.pwc-groups-card {
+  background: var(--pwc-white);
+  border: 1px solid var(--pwc-border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  cursor: pointer;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  box-shadow: var(--pwc-shadow-sm);
+}
+.pwc-groups-card:hover {
+  border-color: var(--pwc-sage);
+  box-shadow: var(--pwc-shadow-md);
+}
+.pwc-groups-card--member {
+  border-left: 4px solid var(--pwc-sage);
+}
+
+.pwc-groups-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.35rem;
+}
+
+.pwc-groups-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.55rem;
+  border-radius: 6px;
+  background: var(--pwc-sage-light);
+  color: var(--pwc-sage-dark);
+}
+.pwc-groups-badge--member {
+  background: var(--pwc-sage-light);
+  color: var(--pwc-sage-dark);
+}
+
+.pwc-groups-card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0.25rem 0 0.35rem;
+  color: var(--pwc-charcoal);
+}
+
+.pwc-groups-card-desc {
+  font-size: 0.9rem;
+  color: var(--pwc-muted);
+  margin: 0 0 0.75rem;
+  line-height: 1.45;
+}
+
+.pwc-groups-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.82rem;
+  color: var(--pwc-muted);
+}
+.pwc-groups-card-members {
+  font-weight: 600;
+  color: var(--pwc-sage-dark);
+}
+
+.pwc-groups-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--pwc-muted);
+  font-size: 0.95rem;
+}
+
+/* Group detail */
+.pwc-groups-detail {
+  margin-bottom: 1.5rem;
+}
+.pwc-groups-detail h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  margin-bottom: 0.5rem;
+}
+.pwc-groups-detail-desc {
+  font-size: 0.95rem;
+  color: var(--pwc-muted);
+  line-height: 1.55;
+  margin-bottom: 1rem;
+}
+.pwc-groups-detail-meta {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.85rem;
+  color: var(--pwc-muted);
+  margin-bottom: 1rem;
+}
+
+/* Group members list */
+.pwc-groups-members h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid var(--pwc-border);
+  padding-bottom: 0.5rem;
+}
+.pwc-groups-member {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--pwc-border);
+}
+.pwc-groups-member:last-child {
+  border-bottom: none;
+}
+.pwc-groups-member-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--pwc-sage-light);
+  color: var(--pwc-sage-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.pwc-groups-member-info {
+  display: flex;
+  flex-direction: column;
+}
+.pwc-groups-member-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--pwc-charcoal);
+}
+.pwc-groups-member-username {
+  font-size: 0.78rem;
+  color: var(--pwc-muted);
+}
+.pwc-groups-no-members {
+  color: var(--pwc-muted);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+/* Blog group badge */
+.pwc-blog-group-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.55rem;
+  border-radius: 6px;
+  background: var(--pwc-warm-light);
+  color: var(--pwc-warm);
+  margin-left: 0.5rem;
+}
+
+/* Small button variant */
+.pwc-btn-sm {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.78rem;
+}
+
+/* Events group filter bar */
+.pwc-events-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.6rem 1rem;
+  background: var(--pwc-white);
+  border: 1px solid var(--pwc-border);
+  border-radius: 8px;
+}

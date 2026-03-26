@@ -89,6 +89,10 @@ show_reading_time: false
               <span class="pwc-info-label">Interests</span>
               <div class="pwc-tag-list" id="ov-interests"></div>
             </div>
+            <div class="pwc-info-card pwc-info-card--wide">
+              <span class="pwc-info-label">My Groups</span>
+              <div class="pwc-tag-list" id="ov-groups"></div>
+            </div>
           </div>
         </section>
 
@@ -229,6 +233,7 @@ show_reading_time: false
   // Used by profile-api.js and any other client auth helpers.
   window.PWC_API_BASE_URL = "{{ site.events_api_base_url | escape }}";
 </script>
+<script src="{{ site.baseurl }}/assets/js/group-api.js"></script>
 <script src="{{ site.baseurl }}/assets/js/profile-api.js"></script>
 <script src="{{ site.baseurl }}/assets/js/profile-messages.js"></script>
 <script src="{{ site.baseurl }}/assets/js/profile.js"></script>

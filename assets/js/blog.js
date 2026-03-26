@@ -15,6 +15,7 @@ var Blog = (function () {
   var pinnedOnly    = false;
   var debounceTimer = null;
   var authors       = [];
+  var myGroups      = [];
 
   /* ── Init ────────────────────────────────────────────────────────────── */
 
@@ -32,6 +33,11 @@ var Blog = (function () {
         if (u) sessionStorage.setItem("pwc_user", JSON.stringify(u));
         else   sessionStorage.removeItem("pwc_user");
         BlogRenderer.setNewPostButton(!!currentUser);
+        if (currentUser && typeof GroupAPI !== "undefined") {
+          GroupAPI.getMyGroups()
+            .then(function (groups) { myGroups = groups || []; })
+            .catch(function () { myGroups = []; });
+        }
       })
       .catch(function () { BlogRenderer.setNewPostButton(!!currentUser); });
 
@@ -126,12 +132,26 @@ var Blog = (function () {
 
   /* ── Compose / Edit ──────────────────────────────────────────────────── */
 
+  function populateGroupSelect(selectedGroupId) {
+    var sel = document.getElementById("blog-post-group");
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Public (visible to all)</option>';
+    myGroups.forEach(function (g) {
+      var opt = document.createElement("option");
+      opt.value = g.id;
+      opt.textContent = g.name + " (group only)";
+      if (selectedGroupId && String(g.id) === String(selectedGroupId)) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+
   function showCompose() {
     document.getElementById("blog-compose-title").textContent = "New Post";
     document.getElementById("blog-edit-id").value             = "";
     document.getElementById("blog-post-title").value          = "";
     document.getElementById("blog-post-body").value           = "";
     document.getElementById("blog-submit-btn").textContent    = "Publish";
+    populateGroupSelect(null);
     document.getElementById("blog-compose-overlay").style.display = "flex";
     document.body.style.overflow = "hidden";
     document.getElementById("blog-post-title").focus();
@@ -144,6 +164,7 @@ var Blog = (function () {
       document.getElementById("blog-post-title").value          = post.title;
       document.getElementById("blog-post-body").value           = post.body;
       document.getElementById("blog-submit-btn").textContent    = "Save Changes";
+      populateGroupSelect(post.group_id);
       document.getElementById("blog-compose-overlay").style.display = "flex";
       document.body.style.overflow = "hidden";
     });
@@ -156,9 +177,11 @@ var Blog = (function () {
 
   function submitPost(e) {
     e.preventDefault();
-    var editId = document.getElementById("blog-edit-id").value;
-    var title  = document.getElementById("blog-post-title").value.trim();
-    var body   = document.getElementById("blog-post-body").value.trim();
+    var editId  = document.getElementById("blog-edit-id").value;
+    var title   = document.getElementById("blog-post-title").value.trim();
+    var body    = document.getElementById("blog-post-body").value.trim();
+    var groupSel = document.getElementById("blog-post-group");
+    var groupId  = groupSel ? groupSel.value || null : null;
     if (!title || !body) return;
 
     var btn = document.getElementById("blog-submit-btn");
@@ -166,8 +189,8 @@ var Blog = (function () {
     btn.textContent = "Saving...";
 
     var apiCall = editId
-      ? BlogAPI.updatePost(editId, title, body)
-      : BlogAPI.createPost(title, body);
+      ? BlogAPI.updatePost(editId, title, body, groupId)
+      : BlogAPI.createPost(title, body, groupId);
 
     apiCall
       .then(function () { hideCompose(); loadPosts(); })
