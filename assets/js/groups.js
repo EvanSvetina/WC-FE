@@ -10,6 +10,8 @@ var Groups = (function () {
 
   var currentUser = null;
   var myGroupIds  = [];
+  var pendingApplicationGroupIds = [];
+  var deniedApplicationGroupIds  = [];
 
   /* ── Init ────────────────────────────────────────────────────────────── */
 
@@ -22,11 +24,38 @@ var Groups = (function () {
     GroupAPI.getMyGroups()
       .then(function (groups) {
         myGroupIds = groups.map(function (g) { return g.id; });
+        if (!currentUser) return;
+        return GroupAPI.getMyApplicationFlags()
+          .then(function (flags) {
+            pendingApplicationGroupIds = flags.pending_group_ids || [];
+            deniedApplicationGroupIds  = flags.denied_group_ids || [];
+          });
       })
-      .catch(function () { myGroupIds = []; })
+      .catch(function () {
+        myGroupIds = [];
+        pendingApplicationGroupIds = [];
+        deniedApplicationGroupIds  = [];
+      })
       .finally(function () {
         GroupRenderer.setCreateButton(!!currentUser);
         loadGroups();
+      });
+  }
+
+  function refreshApplicationFlags() {
+    if (!currentUser) {
+      pendingApplicationGroupIds = [];
+      deniedApplicationGroupIds  = [];
+      return Promise.resolve();
+    }
+    return GroupAPI.getMyApplicationFlags()
+      .then(function (flags) {
+        pendingApplicationGroupIds = flags.pending_group_ids || [];
+        deniedApplicationGroupIds  = flags.denied_group_ids || [];
+      })
+      .catch(function () {
+        pendingApplicationGroupIds = [];
+        deniedApplicationGroupIds  = [];
       });
   }
 
@@ -37,7 +66,13 @@ var Groups = (function () {
 
     GroupAPI.getGroups()
       .then(function (groups) {
-        GroupRenderer.renderGroups(groups, myGroupIds, currentUser);
+        GroupRenderer.renderGroups(
+          groups,
+          myGroupIds,
+          pendingApplicationGroupIds,
+          deniedApplicationGroupIds,
+          currentUser
+        );
       })
       .catch(function () {
         GroupRenderer.showError("Could not load groups. Is the backend running?");
@@ -53,7 +88,15 @@ var Groups = (function () {
     document.body.style.overflow = "hidden";
 
     GroupAPI.getGroup(id)
-      .then(function (group) { GroupRenderer.renderGroupDetail(group, myGroupIds, currentUser); })
+      .then(function (group) {
+        GroupRenderer.renderGroupDetail(
+          group,
+          myGroupIds,
+          pendingApplicationGroupIds,
+          deniedApplicationGroupIds,
+          currentUser
+        );
+      })
       .catch(function ()     {
         document.getElementById("groups-detail-content").innerHTML = '<div class="pwc-blog-empty">Could not load group.</div>';
       });
@@ -76,6 +119,31 @@ var Groups = (function () {
       .catch(function (err) { alert(err.message); });
   }
 
+  function applyToGroup(id) {
+    var msgEl = document.getElementById("groups-apply-message");
+    var msg   = msgEl ? msgEl.value.trim() : "";
+    GroupAPI.submitApplication(id, msg)
+      .then(function () { return refreshApplicationFlags(); })
+      .then(function () {
+        loadGroups();
+        refreshDetailIfOpen(id);
+      })
+      .catch(function (err) { alert(err.message); });
+  }
+
+  function decideApplication(groupId, applicationId, accept) {
+    var call = accept
+      ? GroupAPI.acceptApplication(groupId, applicationId)
+      : GroupAPI.denyApplication(groupId, applicationId);
+    call
+      .then(function () { return refreshApplicationFlags(); })
+      .then(function () {
+        loadGroups();
+        refreshDetailIfOpen(groupId);
+      })
+      .catch(function (err) { alert(err.message); });
+  }
+
   function leaveGroup(id) {
     if (!confirm("Leave this group?")) return;
     GroupAPI.leaveGroup(id)
@@ -92,7 +160,15 @@ var Groups = (function () {
     var overlay = document.getElementById("groups-detail-overlay");
     if (overlay && overlay.style.display !== "none") {
       GroupAPI.getGroup(id)
-        .then(function (group) { GroupRenderer.renderGroupDetail(group, myGroupIds, currentUser); })
+        .then(function (group) {
+          GroupRenderer.renderGroupDetail(
+            group,
+            myGroupIds,
+            pendingApplicationGroupIds,
+            deniedApplicationGroupIds,
+            currentUser
+          );
+        })
         .catch(function () {});
     }
   }
@@ -104,6 +180,8 @@ var Groups = (function () {
     document.getElementById("groups-edit-id").value             = "";
     document.getElementById("groups-name").value                = "";
     document.getElementById("groups-desc").value                = "";
+    document.getElementById("groups-membership-open").checked   = true;
+    document.getElementById("groups-membership-apply").checked  = false;
     document.getElementById("groups-submit-btn").textContent    = "Create Group";
     document.getElementById("groups-compose-overlay").style.display = "flex";
     document.body.style.overflow = "hidden";
@@ -116,6 +194,9 @@ var Groups = (function () {
       document.getElementById("groups-edit-id").value             = group.id;
       document.getElementById("groups-name").value                = group.name;
       document.getElementById("groups-desc").value                = group.description;
+      var req = !!group.requires_application;
+      document.getElementById("groups-membership-open").checked  = !req;
+      document.getElementById("groups-membership-apply").checked = req;
       document.getElementById("groups-submit-btn").textContent    = "Save Changes";
       document.getElementById("groups-compose-overlay").style.display = "flex";
       document.body.style.overflow = "hidden";
@@ -132,6 +213,7 @@ var Groups = (function () {
     var editId = document.getElementById("groups-edit-id").value;
     var name   = document.getElementById("groups-name").value.trim();
     var desc   = document.getElementById("groups-desc").value.trim();
+    var requiresApplication = document.getElementById("groups-membership-apply").checked;
     if (!name) return;
 
     var btn = document.getElementById("groups-submit-btn");
@@ -139,8 +221,8 @@ var Groups = (function () {
     btn.textContent = "Saving...";
 
     var apiCall = editId
-      ? GroupAPI.updateGroup(editId, name, desc)
-      : GroupAPI.createGroup(name, desc);
+      ? GroupAPI.updateGroup(editId, name, desc, requiresApplication)
+      : GroupAPI.createGroup(name, desc, requiresApplication);
 
     apiCall
       .then(function (result) {
@@ -184,8 +266,10 @@ var Groups = (function () {
   return {
     openGroup:   openGroup,
     hideDetail:  hideDetail,
-    joinGroup:   joinGroup,
-    leaveGroup:  leaveGroup,
+    joinGroup:          joinGroup,
+    applyToGroup:       applyToGroup,
+    decideApplication:  decideApplication,
+    leaveGroup:         leaveGroup,
     showCreate:  showCreate,
     showEdit:    showEdit,
     hideCompose: hideCompose,

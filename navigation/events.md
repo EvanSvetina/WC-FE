@@ -37,6 +37,7 @@ show_reading_time: false
   <div id="pwc-admin-attendees" hidden>
     <p style="margin: 0.5rem 0 0; font-weight: 700;">Attendees (admin)</p>
     <div id="pwc-admin-attendees-count" style="margin-bottom: 0.5rem; color: rgba(255,255,255,0.85);"></div>
+    <button id="pwc-admin-test-signup-btn" type="button" class="pwc-btn pwc-btn-border" style="margin-bottom:0.5rem;" hidden>Add Test Signup</button>
     <div id="pwc-admin-attendees-groups"></div>
   </div>
 
@@ -105,6 +106,21 @@ show_reading_time: false
       <label>
         End (date/time)
         <input type="datetime-local" name="preferred_end_datetime" required>
+      </label>
+      <label>
+        Max attendees
+        <input type="number" name="max_attendees" min="1" step="1" placeholder="e.g. 25">
+      </label>
+      <label id="pwc-meeting-visibility-scope-label">
+        Who can see/join this event?
+        <select name="visibility_scope">
+          <option value="club">Entire club</option>
+          <option value="groups">Selected groups only</option>
+        </select>
+      </label>
+      <label class="pwc-span-2" id="pwc-meeting-visible-groups-label" hidden>
+        Allowed groups
+        <div id="pwc-meeting-visible-groups-list" style="max-height:140px; overflow:auto; border:1px solid rgba(232,223,226,0.95); border-radius:8px; padding:0.5rem;"></div>
       </label>
       <label class="pwc-span-2">
         Topic / meeting type
@@ -243,6 +259,7 @@ show_reading_time: false
 
     var myGroupIds = [];
     var selectedGroupFilter = "";
+    var allGroupsCache = [];
 
     var authCache = { status: "unknown", user: null };
 
@@ -271,6 +288,82 @@ show_reading_time: false
 
     function isAdminUser(u) {
       return !!(u && u.role && String(u.role).toLowerCase() === "admin");
+    }
+
+    function displayNameFromUser(u) {
+      if (!u) return "";
+      var first = u.firstName || u.first_name || "";
+      var last = u.lastName || u.last_name || "";
+      var full = (String(first || "").trim() + " " + String(last || "").trim()).trim();
+      if (full) return full;
+      return u.username || u.email || "";
+    }
+
+    function capacityColor(fillRatio) {
+      var r = Number(fillRatio || 0);
+      if (!isFinite(r)) r = 0;
+      if (r >= 1) return { bg: "rgba(168, 69, 86, 0.55)", border: "rgba(168, 69, 86, 0.95)" };
+      if (r >= 0.8) return { bg: "rgba(182, 84, 96, 0.50)", border: "rgba(182, 84, 96, 0.92)" };
+      if (r >= 0.6) return { bg: "rgba(196, 120, 138, 0.45)", border: "rgba(196, 120, 138, 0.88)" };
+      if (r >= 0.4) return { bg: "rgba(186, 148, 112, 0.40)", border: "rgba(186, 148, 112, 0.85)" };
+      if (r >= 0.2) return { bg: "rgba(158, 156, 112, 0.35)", border: "rgba(158, 156, 112, 0.85)" };
+      return { bg: "rgba(122, 142, 107, 0.28)", border: "rgba(122, 142, 107, 0.85)" };
+    }
+
+    function getCheckedGroupIds() {
+      var list = $("pwc-meeting-visible-groups-list");
+      if (!list) return [];
+      var checked = list.querySelectorAll("input[type='checkbox'][data-group-id]:checked");
+      var ids = [];
+      checked.forEach(function (el) {
+        var n = parseInt(el.getAttribute("data-group-id"), 10);
+        if (isFinite(n) && n > 0) ids.push(n);
+      });
+      return ids;
+    }
+
+    function renderVisibilityGroupOptions(groups, preselectedIds) {
+      var list = $("pwc-meeting-visible-groups-list");
+      if (!list) return;
+      list.innerHTML = "";
+      var selectedSet = {};
+      (preselectedIds || []).forEach(function (id) { selectedSet[String(id)] = true; });
+      (groups || []).forEach(function (g) {
+        var row = document.createElement("label");
+        row.style.display = "flex";
+        row.style.alignItems = "center";
+        row.style.gap = "0.45rem";
+        row.style.margin = "0.2rem 0";
+        row.style.fontSize = "0.9rem";
+        row.style.cursor = "pointer";
+
+        var cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.setAttribute("data-group-id", String(g.id));
+        cb.style.width = "auto";
+        cb.style.minWidth = "auto";
+        cb.style.flex = "0 0 auto";
+        cb.style.margin = "0";
+        if (selectedSet[String(g.id)]) cb.checked = true;
+
+        row.appendChild(cb);
+        row.appendChild(document.createTextNode(g.name));
+        list.appendChild(row);
+      });
+    }
+
+    async function loadAllGroups() {
+      if (!API_BASE_URL) return [];
+      if (allGroupsCache.length) return allGroupsCache;
+      try {
+        var resp = await fetch(apiUrl("/api/groups/"), { credentials: "include" });
+        if (!resp.ok) return [];
+        var data = await resp.json();
+        allGroupsCache = Array.isArray(data) ? data : [];
+        return allGroupsCache;
+      } catch (_) {
+        return [];
+      }
     }
 
     async function loadEventAttendingCount(eventId) {
@@ -321,12 +414,30 @@ show_reading_time: false
       }
     }
 
+    async function removeLoggedInRsvpAdmin(eventId, userId) {
+      if (!API_BASE_URL || !eventId || !userId) return false;
+      var resp = await fetch(apiUrl("/api/events/" + eventId + "/admin-remove-user-rsvp/" + userId), {
+        method: "DELETE",
+        credentials: "include"
+      });
+      return resp.ok;
+    }
+
+    async function removePublicRsvpAdmin(publicRsvpId) {
+      if (!API_BASE_URL || !publicRsvpId) return false;
+      var resp = await fetch(apiUrl("/api/events/public-rsvp/" + publicRsvpId), {
+        method: "DELETE",
+        credentials: "include"
+      });
+      return resp.ok;
+    }
+
     async function loadBackendEvents() {
       if (!API_BASE_URL) return [];
 
       try {
         // Show both past + future so users see scheduled meetings on the calendar
-        var resp = await fetch(apiUrl("/api/events/?upcoming=false"), { credentials: "omit" });
+        var resp = await fetch(apiUrl("/api/events/?upcoming=false"), { credentials: "include" });
         if (!resp.ok) return [];
         var list = await resp.json();
         if (!Array.isArray(list)) return [];
@@ -336,11 +447,12 @@ show_reading_time: false
           var isMemberGroup = isGroupEvent && myGroupIds.indexOf(e.group_id) !== -1;
 
           // Gold highlight for group events the user belongs to
-          var bgColor    = "rgba(122, 142, 107, 0.28)";
-          var bdrColor   = "rgba(122, 142, 107, 0.85)";
+          var cap = capacityColor(e.fill_ratio);
+          var bgColor    = cap.bg;
+          var bdrColor   = cap.border;
           if (isGroupEvent && isMemberGroup) {
-            bgColor  = "rgba(201, 160, 112, 0.35)";
-            bdrColor = "rgba(201, 160, 112, 0.90)";
+            bgColor  = "rgba(201, 160, 112, 0.45)";
+            bdrColor = "rgba(201, 160, 112, 0.92)";
           } else if (isGroupEvent) {
             bgColor  = "rgba(196, 120, 138, 0.22)";
             bdrColor = "rgba(196, 120, 138, 0.70)";
@@ -359,7 +471,13 @@ show_reading_time: false
               backendEventId: e.id,
               location: e.location || "",
               groupId: e.group_id || null,
-              groupName: e.group_name || ""
+              groupName: e.group_name || "",
+              visibilityScope: e.visibility_scope || "club",
+              visibleGroupIds: Array.isArray(e.visible_group_ids) ? e.visible_group_ids : [],
+              maxAttendees: e.max_attendees || null,
+              seatsUsed: e.seats_used || 0,
+              fillRatio: e.fill_ratio || 0,
+              isFull: !!e.is_full
             }
           };
         });
@@ -384,6 +502,12 @@ show_reading_time: false
 
       var loc = (fcEvent.extendedProps && fcEvent.extendedProps.location) ? fcEvent.extendedProps.location : "";
       if (loc) meta = meta + " — " + loc;
+      var maxAttendees = fcEvent.extendedProps ? fcEvent.extendedProps.maxAttendees : null;
+      var seatsUsed = fcEvent.extendedProps ? fcEvent.extendedProps.seatsUsed : null;
+      if (maxAttendees) {
+        var seatsText = (typeof seatsUsed === "number" ? seatsUsed : "0") + "/" + maxAttendees + " seats";
+        meta = meta ? (meta + " — " + seatsText) : seatsText;
+      }
 
       $("pwc-rsvp-title").textContent = "RSVP: " + (fcEvent.title || "Meeting");
       var baseMeta = meta;
@@ -407,18 +531,28 @@ show_reading_time: false
       var userDisplay = $("pwc-rsvp-user-display");
 
       if (me) {
-        if (nameLabel) { nameLabel.hidden = true; nameLabel.querySelector("input").removeAttribute("required"); }
-        if (emailLabel) { emailLabel.hidden = true; emailLabel.querySelector("input").removeAttribute("required"); }
+        if (nameLabel) {
+          nameLabel.hidden = true;
+          if (nameLabel.querySelector("input")) nameLabel.querySelector("input").removeAttribute("required");
+        }
+        if (emailLabel) {
+          emailLabel.hidden = true;
+          if (emailLabel.querySelector("input")) emailLabel.querySelector("input").removeAttribute("required");
+        }
         if (userBanner) userBanner.hidden = false;
         if (userDisplay) {
-          var displayName = (me.firstName || me.first_name || "");
-          if (displayName && (me.lastName || me.last_name || "")) displayName += " " + (me.lastName || me.last_name);
-          if (!displayName) displayName = me.username || me.email || "you";
+          var displayName = displayNameFromUser(me) || "you";
           userDisplay.textContent = displayName;
         }
       } else {
-        if (nameLabel) { nameLabel.hidden = false; nameLabel.querySelector("input").setAttribute("required", ""); }
-        if (emailLabel) { emailLabel.hidden = false; emailLabel.querySelector("input").setAttribute("required", ""); }
+        if (nameLabel) {
+          nameLabel.hidden = false;
+          if (nameLabel.querySelector("input")) nameLabel.querySelector("input").setAttribute("required", "");
+        }
+        if (emailLabel) {
+          emailLabel.hidden = false;
+          if (emailLabel.querySelector("input")) emailLabel.querySelector("input").setAttribute("required", "");
+        }
         if (userBanner) userBanner.hidden = true;
       }
 
@@ -430,10 +564,49 @@ show_reading_time: false
       var adminPanel = $("pwc-admin-attendees");
       var adminGroups = $("pwc-admin-attendees-groups");
       var adminCountEl = $("pwc-admin-attendees-count");
+      var adminTestBtn = $("pwc-admin-test-signup-btn");
       if (adminPanel) adminPanel.hidden = true;
+      if (adminTestBtn) adminTestBtn.hidden = true;
 
       var backendId = backendEventId || "";
       if (backendId && start) {
+        if (adminTestBtn && me && me.role === "admin") {
+          adminTestBtn.hidden = false;
+          adminTestBtn.textContent = "Add Test Signups";
+          adminTestBtn.onclick = async function () {
+            try {
+              var raw = window.prompt("How many test users to add?", "1");
+              if (raw === null) return;
+              var count = parseInt(raw, 10);
+              if (!isFinite(count) || count < 1) {
+                showRsvpFeedback("Please enter a valid positive number.", true);
+                return;
+              }
+              var resp = await fetch(apiUrl("/api/events/" + backendId + "/admin-test-signup"), {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ count: count })
+              });
+              var data = {};
+              try { data = await resp.json(); } catch (_) {}
+              if (!resp.ok) {
+                showRsvpFeedback((data && data.error) ? data.error : "Failed to add test signup.", true);
+                return;
+              }
+              var added = (data && typeof data.added === "number") ? data.added : count;
+              var req = (data && typeof data.requested === "number") ? data.requested : count;
+              var msg = (added === req)
+                ? ("Added " + added + " test signup" + (added === 1 ? "" : "s") + ".")
+                : ("Added " + added + " of " + req + " test signups (event reached capacity).");
+              showRsvpFeedback(msg, false);
+              if (calendarInstance && calendarInstance.refetchEvents) calendarInstance.refetchEvents();
+              openRsvpModal(fcEvent);
+            } catch (err) {
+              showRsvpFeedback((err && err.message) ? err.message : "Failed to add test signup.", true);
+            }
+          };
+        }
         loadEventAttendingCount(backendId).then(function (count) {
           if (typeof count === "number") {
             $("pwc-rsvp-meta").textContent = baseMeta + " — " + count + " attending";
@@ -459,6 +632,7 @@ show_reading_time: false
             loggedIn.forEach(function (u) {
               groupsHtml += "<div style='font-size:0.92rem; margin:0.25rem 0;'>"
                 + (u.username || "—") + " — " + (u.email || "—")
+                + (u.user_id ? " <button type='button' class='pwc-btn pwc-btn-border pwc-remove-loggedin' data-user-id='" + u.user_id + "' style='margin-left:0.5rem;padding:0.15rem 0.45rem;font-size:0.75rem;'>Remove</button>" : "")
                 + "</div>";
             });
 
@@ -467,11 +641,36 @@ show_reading_time: false
             pub.forEach(function (r) {
               groupsHtml += "<div style='font-size:0.92rem; margin:0.25rem 0;'>"
                 + (r.name || "—") + " (" + (r.attendance || "—") + ") — " + (r.email || "—")
+                + (r.public_rsvp_id ? " <button type='button' class='pwc-btn pwc-btn-border pwc-remove-public' data-public-rsvp-id='" + r.public_rsvp_id + "' style='margin-left:0.5rem;padding:0.15rem 0.45rem;font-size:0.75rem;'>Remove</button>" : "")
                 + "</div>";
             });
           }
 
           adminGroups.innerHTML = groupsHtml;
+          var rmLogged = adminGroups.querySelectorAll(".pwc-remove-loggedin");
+          rmLogged.forEach(function (btn) {
+            btn.addEventListener("click", async function () {
+              var uid = btn.getAttribute("data-user-id");
+              if (!uid) return;
+              var ok = await removeLoggedInRsvpAdmin(backendId, uid);
+              if (!ok) { showRsvpFeedback("Failed to remove logged-in RSVP.", true); return; }
+              showRsvpFeedback("Removed logged-in RSVP.", false);
+              if (calendarInstance && calendarInstance.refetchEvents) calendarInstance.refetchEvents();
+              openRsvpModal(fcEvent);
+            });
+          });
+          var rmPublic = adminGroups.querySelectorAll(".pwc-remove-public");
+          rmPublic.forEach(function (btn) {
+            btn.addEventListener("click", async function () {
+              var rid = btn.getAttribute("data-public-rsvp-id");
+              if (!rid) return;
+              var ok = await removePublicRsvpAdmin(rid);
+              if (!ok) { showRsvpFeedback("Failed to remove public RSVP.", true); return; }
+              showRsvpFeedback("Removed public RSVP.", false);
+              if (calendarInstance && calendarInstance.refetchEvents) calendarInstance.refetchEvents();
+              openRsvpModal(fcEvent);
+            });
+          });
         });
       } else if (start && fcEvent.title) {
         loadAttendingCount(fcEvent.title, start.toISOString()).then(function (count) {
@@ -496,10 +695,23 @@ show_reading_time: false
             list.forEach(function (r) {
               groupsHtml2 += "<div style='font-size:0.92rem; margin:0.25rem 0;'>"
                 + (r.name || "—") + " (" + (r.attendance || "—") + ") — " + (r.email || "—")
+                + (r.public_rsvp_id ? " <button type='button' class='pwc-btn pwc-btn-border pwc-remove-public' data-public-rsvp-id='" + r.public_rsvp_id + "' style='margin-left:0.5rem;padding:0.15rem 0.45rem;font-size:0.75rem;'>Remove</button>" : "")
                 + "</div>";
             });
           }
           adminGroups.innerHTML = groupsHtml2;
+          var rmPublic2 = adminGroups.querySelectorAll(".pwc-remove-public");
+          rmPublic2.forEach(function (btn) {
+            btn.addEventListener("click", async function () {
+              var rid = btn.getAttribute("data-public-rsvp-id");
+              if (!rid) return;
+              var ok = await removePublicRsvpAdmin(rid);
+              if (!ok) { showRsvpFeedback("Failed to remove public RSVP.", true); return; }
+              showRsvpFeedback("Removed public RSVP.", false);
+              if (calendarInstance && calendarInstance.refetchEvents) calendarInstance.refetchEvents();
+              openRsvpModal(fcEvent);
+            });
+          });
         });
       }
     }
@@ -530,6 +742,72 @@ show_reading_time: false
         form.elements["preferred_datetime"].value = toDatetimeLocalValue(dt);
         form.elements["preferred_end_datetime"].value = toDatetimeLocalValue(dtEnd);
       }
+
+      // Logged-in users should not re-enter name/email.
+      getCurrentUser().then(function (me) {
+        if (!form) return;
+        var nameInput = form.elements["name"];
+        var emailInput = form.elements["email"];
+        var scopeLabel = $("pwc-meeting-visibility-scope-label");
+        var groupsLabel = $("pwc-meeting-visible-groups-label");
+        var scopeSelect = form.elements["visibility_scope"];
+        var groupsList = $("pwc-meeting-visible-groups-list");
+
+        function syncVisibilityUi() {
+          if (!scopeSelect || !groupsLabel || !groupsList) return;
+          var isGroups = scopeSelect.value === "groups";
+          groupsLabel.hidden = !isGroups;
+          if (groupsList) groupsList.setAttribute("data-required", isGroups ? "1" : "0");
+        }
+
+        if (me) {
+          var autoName = displayNameFromUser(me) || "Member";
+          var autoEmail = me.email || "";
+          if (nameInput) {
+            nameInput.value = autoName;
+            nameInput.required = false;
+            if (nameInput.parentElement) nameInput.parentElement.hidden = true;
+          }
+          if (emailInput) {
+            emailInput.value = autoEmail;
+            emailInput.required = false;
+            if (emailInput.parentElement) emailInput.parentElement.hidden = true;
+          }
+          if (isAdminUser(me)) {
+            if (scopeLabel) scopeLabel.hidden = false;
+            if (scopeSelect) scopeSelect.value = "club";
+            loadAllGroups().then(function (groups) {
+              renderVisibilityGroupOptions(groups, myGroupIds || []);
+              syncVisibilityUi();
+            });
+            if (scopeSelect) scopeSelect.onchange = syncVisibilityUi;
+          } else {
+            if (scopeLabel) scopeLabel.hidden = true;
+            if (groupsLabel) groupsLabel.hidden = true;
+            if (scopeSelect) scopeSelect.value = "club";
+            if (groupsList) {
+              groupsList.setAttribute("data-required", "0");
+              groupsList.innerHTML = "";
+            }
+          }
+        } else {
+          if (nameInput) {
+            nameInput.required = true;
+            if (nameInput.parentElement) nameInput.parentElement.hidden = false;
+          }
+          if (emailInput) {
+            emailInput.required = true;
+            if (emailInput.parentElement) emailInput.parentElement.hidden = false;
+          }
+          if (scopeLabel) scopeLabel.hidden = true;
+          if (groupsLabel) groupsLabel.hidden = true;
+          if (scopeSelect) scopeSelect.value = "club";
+          if (groupsList) {
+            groupsList.setAttribute("data-required", "0");
+            groupsList.innerHTML = "";
+          }
+        }
+      });
 
       var missing = $("pwc-meeting-modal-missing-config");
       var feedback = $("pwc-meeting-modal-feedback");
@@ -682,12 +960,15 @@ show_reading_time: false
           }
 
           // Public fallback for recurring/client-generated events or anonymous users.
+          var me2 = await getCurrentUser();
+          var autoName = me2 ? (displayNameFromUser(me2) || "Member") : "";
+          var autoEmail = me2 ? (me2.email || "") : "";
           var payload = {
             event_id: $("pwc-rsvp-event-id").value || null,
             event_title: $("pwc-rsvp-event-title").value || "",
             event_datetime: $("pwc-rsvp-event-datetime").value || "",
-            name: rsvpForm.elements["name"].value,
-            email: rsvpForm.elements["email"].value,
+            name: me2 ? autoName : rsvpForm.elements["name"].value,
+            email: me2 ? autoEmail : rsvpForm.elements["email"].value,
             attendance: rsvpForm.elements["attendance"].value,
             notes: rsvpForm.elements["notes"].value || null,
             event_location: rsvpForm.dataset.location || null
@@ -719,6 +1000,7 @@ show_reading_time: false
             name: meetingForm.elements["name"].value,
             email: meetingForm.elements["email"].value,
             preferred_datetime: meetingForm.elements["preferred_datetime"].value || null,
+            max_attendees: meetingForm.elements["max_attendees"] ? (meetingForm.elements["max_attendees"].value || null) : null,
             topic: meetingForm.elements["topic"].value,
             description: meetingForm.elements["description"].value
           };
@@ -726,6 +1008,7 @@ show_reading_time: false
           try {
             var resp = await fetch(apiUrl("/api/events/meeting-request"), {
               method: "POST",
+              credentials: "include",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(payload)
             });
@@ -782,11 +1065,30 @@ show_reading_time: false
             return;
           }
 
+          var meSched = await getCurrentUser();
+          var scopeVal = "club";
+          var visibleGroupIds = [];
+          if (meSched && isAdminUser(meSched)) {
+            scopeVal = meetingModalForm.elements["visibility_scope"]
+              ? (meetingModalForm.elements["visibility_scope"].value || "club")
+              : "club";
+            visibleGroupIds = getCheckedGroupIds();
+            if (scopeVal === "groups" && !visibleGroupIds.length) {
+              if (meetingModalFeedback) {
+                meetingModalFeedback.hidden = false;
+                meetingModalFeedback.textContent = "Select at least one group for group-only visibility.";
+              }
+              return;
+            }
+          }
           var payload = {
-            name: meetingModalForm.elements["name"].value,
-            email: meetingModalForm.elements["email"].value,
+            name: meSched ? (displayNameFromUser(meSched) || "Member") : meetingModalForm.elements["name"].value,
+            email: meSched ? (meSched.email || "") : meetingModalForm.elements["email"].value,
             preferred_datetime: meetingModalForm.elements["preferred_datetime"].value || null,
             preferred_end_datetime: meetingModalForm.elements["preferred_end_datetime"].value || null,
+            max_attendees: meetingModalForm.elements["max_attendees"] ? (meetingModalForm.elements["max_attendees"].value || null) : null,
+            visibility_scope: scopeVal,
+            visible_group_ids: visibleGroupIds,
             topic: meetingModalForm.elements["topic"].value,
             description: meetingModalForm.elements["description"].value
           };
@@ -794,6 +1096,7 @@ show_reading_time: false
           try {
             var resp = await fetch(apiUrl("/api/events/meeting-request"), {
               method: "POST",
+              credentials: "include",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(payload)
             });
@@ -889,7 +1192,19 @@ show_reading_time: false
               var filtered = apiEvents;
               if (selectedGroupFilter) {
                 filtered = apiEvents.filter(function (ev) {
-                  return ev.extendedProps && String(ev.extendedProps.groupId) === selectedGroupFilter;
+                  if (!ev.extendedProps) return false;
+                  var scope = ev.extendedProps.visibilityScope || "club";
+                  // Group filter view should show group-scoped events for that group only.
+                  if (scope !== "groups") return false;
+                  if (String(ev.extendedProps.groupId || "") === selectedGroupFilter) return true;
+                  var visible = ev.extendedProps.visibleGroupIds || [];
+                  return visible.map(function (x) { return String(x); }).indexOf(String(selectedGroupFilter)) !== -1;
+                });
+              } else {
+                // "All Events" should only show events visible to the entire club.
+                filtered = apiEvents.filter(function (ev) {
+                  if (!ev.extendedProps) return true;
+                  return (ev.extendedProps.visibilityScope || "club") !== "groups";
                 });
               }
               successCallback(base.concat(filtered));
