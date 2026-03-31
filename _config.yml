@@ -12,9 +12,12 @@ future: true
 # Build settings
 incremental: false
 
-theme: minima
+remote_theme: jekyll/minima
 plugins:
+  - jekyll-remote-theme
   - jekyll-include-cache
+  - jekyll-feed
+  - jekyll-seo-tag
 
 # Minima theme config
 minima:
