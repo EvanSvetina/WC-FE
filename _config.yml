@@ -38,7 +38,7 @@ events_meeting_request_form_action: ""
 
 # Public API base URL for calendar/RSVP interactions (Flask backend).
 # Example: "http://localhost:5001"
-events_api_base_url: "https://pwc.opencodingsociety.com"
+events_api_base_url: "https://pwc-flask.opencodingsociety.com"
 
 exclude:
   - venv

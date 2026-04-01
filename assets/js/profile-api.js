@@ -6,7 +6,7 @@
 var ProfileAPI = (function () {
   "use strict";
 
-  var API_BASE_URL = (window.PWC_API_BASE_URL || "http://localhost:5001").replace(/\/$/, "");
+  var API_BASE_URL = (window.PWC_API_BASE_URL || "http://localhost:8327").replace(/\/$/, "");
 
   function validateSession() {
     return fetch(API_BASE_URL + "/api/auth/me", { credentials: "include" })
