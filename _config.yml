@@ -6,15 +6,19 @@ description: "Serving the Poway community since 1960 — scholarships, arts, civ
 owner_name: Poway-Women-s-Club
 github_username: EvanSvetina
 github_repo: "pwc"
+repository: "Poway-Women-s-Club/pwc"
 baseurl: "/pwc"
 future: true
 
 # Build settings
 incremental: false
 
-theme: minima
+remote_theme: jekyll/minima
 plugins:
+  - jekyll-remote-theme
   - jekyll-include-cache
+  - jekyll-feed
+  - jekyll-seo-tag
 
 # Minima theme config
 minima:
@@ -34,7 +38,7 @@ events_meeting_request_form_action: ""
 
 # Public API base URL for calendar/RSVP interactions (Flask backend).
 # Example: "http://localhost:5001"
-events_api_base_url: "http://localhost:8327"
+events_api_base_url: "https://pwc.opencodingsociety.com"
 
 exclude:
   - venv
