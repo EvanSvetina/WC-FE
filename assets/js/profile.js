@@ -115,6 +115,10 @@
 
     function renderAvatarDisplays() {
       var url = (user.avatar_url || "").trim();
+      // Avoid mixed-content if the server returns an http:// avatar URL while the page is https://.
+      if (url && location && location.protocol === "https:" && url.indexOf("http://") === 0) {
+        url = "https://" + url.slice("http://".length);
+      }
       var imgS = el("sidebarAvatarImg");
       var imgT = el("topbarAvatarImg");
       var spanI = el("avatarInitials");
