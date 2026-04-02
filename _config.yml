@@ -36,8 +36,10 @@ minima:
 events_rsvp_form_action: ""
 events_meeting_request_form_action: ""
 
-# Deployed / production API (GitHub Pages, or any non-localhost hostname).
-# Local Jekyll (localhost / 127.0.0.1) uses events_api_local_url so sessions & RSVP match Login/Blog/Groups.
+# Deployed / production API — must be the exact HTTPS URL where Flask is reachable in the browser.
+# Common mistake: a typo (e.g. …opencoding.com vs …opencodingsociety.com) breaks login with "Failed to fetch".
+# Quick check: open https://YOUR-API-HOST/api/health in a new tab — expect {"status":"ok"}.
+# After changing this, rebuild GitHub Pages and hard-refresh the site.
 events_api_base_url: "https://pwc-flask.opencodingsociety.com"
 events_api_local_url: "http://localhost:8327"
 

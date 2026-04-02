@@ -25,6 +25,28 @@
 
   function el(id) { return document.getElementById(id); }
 
+  function isNetworkFailure(err) {
+    if (!err) return false;
+    if (err.name === 'TypeError') return true;
+    var m = String(err.message || err).toLowerCase();
+    return m.indexOf('failed to fetch') !== -1 || m.indexOf('networkerror') !== -1
+      || m.indexOf('load failed') !== -1 || m.indexOf('aborted') !== -1;
+  }
+
+  function networkHelpMessage() {
+    return (
+      'Cannot reach the member API at ' + API_BASE_URL + '. ' +
+      'Confirm _config.yml → events_api_base_url is your real Flask URL (no typos in the hostname). ' +
+      'Open ' + API_BASE_URL + '/api/health in a new tab — you should see {"status":"ok"}. ' +
+      'If that fails, fix DNS / HTTPS / your server (HTTP/2 proxy errors often need nginx/Caddy tweaks), ' +
+      'then rebuild GitHub Pages and hard-refresh.'
+    );
+  }
+
+  function showApiError(err) {
+    showAlert(isNetworkFailure(err) ? networkHelpMessage() : (err.message || String(err)));
+  }
+
   function showAlert(msg) {
     var a = el('loginAlert');
     a.textContent = msg;
@@ -138,7 +160,7 @@
       })
       .catch(function (err) {
         setLoading('loginBtn', false, 'Sign In');
-        showAlert(err.message || err);
+        showApiError(err);
         el('password').value = '';
         el('password').focus();
       });
@@ -199,7 +221,7 @@
     })
     .catch(function (err) {
       setLoading('registerBtn', false, 'Create Account');
-      showAlert(err.message || err);
+      showApiError(err);
     });
   }
 
@@ -261,7 +283,8 @@
   } catch (_) {}
 
   window.PWC_GOOGLE_ERROR = function (err) {
-    showAlert(err && err.message ? err.message : String(err));
+    var e = err && err.message ? err : new Error(err != null ? String(err) : '');
+    showApiError(e);
   };
 
   if (window.PWCGoogleOAuth) {
@@ -280,5 +303,20 @@
   // Focus username field on load
   var uField = el('username');
   if (uField) { uField.focus(); }
+
+  /* Proactive check on production Pages: wrong events_api_base_url shows a clear banner */
+  (function checkApiReachable() {
+    try {
+      var h = location.hostname;
+      if (h === 'localhost' || h === '127.0.0.1') return;
+      fetch(API_BASE_URL + '/api/health', { method: 'GET', credentials: 'omit' })
+        .then(function (r) {
+          if (!r.ok) showAlert(networkHelpMessage());
+        })
+        .catch(function () {
+          showAlert(networkHelpMessage());
+        });
+    } catch (_) { /* no-op */ }
+  })();
 
 })();
