@@ -1011,13 +1011,6 @@ show_reading_time: false
 
                 // Update feedback + counts.
                 var thanks = "Thanks! Your RSVP was submitted.";
-                if (attendance === "yes") {
-                  var cbRm2 = $("pwc-rsvp-wants-reminder");
-                  var askedRm = cbRm2 && cbRm2.checked;
-                  if (askedRm && data && data.reminder_confirmation_email_sent === false) {
-                    thanks += " Reminders are saved, but the confirmation email was not sent — the server needs SMTP configured (MAIL_SERVER, MAIL_USERNAME, MAIL_PASSWORD in pwc-flask .env).";
-                  }
-                }
                 showRsvpFeedback(thanks, false);
                 if (backendIdVal) {
                   var count = await loadEventAttendingCount(backendIdVal);
