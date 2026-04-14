@@ -28,9 +28,9 @@ var FriendsAPI = (function () {
     return fetch(BASE + path, opts).then(function (r) {
       if (!r.ok) {
         return r.json().then(function (d) {
-          throw new Error(d.error || "Request failed");
+          throw new Error(d.error || "Request failed (" + r.status + ")");
         }).catch(function (e) {
-          if (e instanceof Error && e.message !== "Request failed") throw new Error("Request failed (" + r.status + ")");
+          if (e instanceof SyntaxError) throw new Error("Request failed (" + r.status + ")");
           throw e;
         });
       }
@@ -91,6 +91,10 @@ var FriendsAPI = (function () {
     return request("GET", "/api/messages/conversations/" + userId);
   }
 
+  function getThreadSince(userId, since) {
+    return request("GET", "/api/messages/conversations/" + userId + "?since=" + encodeURIComponent(since));
+  }
+
   function sendMessage(userId, body) {
     return request("POST", "/api/messages/conversations/" + userId, { body: body });
   }
@@ -117,6 +121,7 @@ var FriendsAPI = (function () {
     // Messages
     getConversations: getConversations,
     getThread:        getThread,
+    getThreadSince:   getThreadSince,
     sendMessage:      sendMessage,
     markRead:         markRead,
     getUnreadCount:   getUnreadCount,

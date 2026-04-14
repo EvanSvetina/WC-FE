@@ -10,10 +10,13 @@ var ProfileMessages = (function () {
 
   /* ── Private state ───────────────────────────────────────────────────── */
 
-  var currentUser   = null;
-  var activeContact = null;   /* user object from API */
-  var conversations = [];     /* from GET /api/messages/conversations */
-  var threadCache   = {};     /* userId → messages array */
+  var currentUser      = null;
+  var activeContact    = null;   /* user object from API */
+  var conversations    = [];     /* from GET /api/messages/conversations */
+  var threadCache      = {};     /* userId → messages array */
+  var lastRenderedDate = null;   /* last date-divider label rendered, for appending */
+  var pollTimer        = null;
+  var isSending        = false;
 
   /* ── Helpers ─────────────────────────────────────────────────────────── */
 
@@ -131,10 +134,76 @@ var ProfileMessages = (function () {
     });
   }
 
+  /* ── 5-second polling ────────────────────────────────────────────────── */
+
+  function startPoll() {
+    stopPoll();
+    pollTimer = setInterval(pollForUpdates, 5000);
+  }
+
+  function stopPoll() {
+    if (pollTimer !== null) { clearInterval(pollTimer); pollTimer = null; }
+  }
+
+  function pollForUpdates() {
+    /* Always refresh the conversations sidebar */
+    loadConversations();
+
+    /* If a conversation is open, fetch any new messages since the last one */
+    if (!activeContact) return;
+    var cache = threadCache[activeContact.id];
+    if (!cache || !cache.length) return;
+    var since = cache[cache.length - 1].created_at;
+
+    FriendsAPI.getThreadSince(activeContact.id, since)
+      .then(function (data) {
+        var newMsgs = data.messages || [];
+        if (!newMsgs.length) return;
+        threadCache[activeContact.id] = threadCache[activeContact.id].concat(newMsgs);
+        appendMessages(newMsgs);
+        FriendsAPI.markRead(activeContact.id).catch(function () {});
+      })
+      .catch(function () {});
+  }
+
+  /* ── Append helpers ──────────────────────────────────────────────────── */
+
+  function appendMessages(messages) {
+    if (!messages || !messages.length) return;
+    var container = el("dmMessages");
+    if (!container) return;
+
+    /* Remove "no messages yet" hint if present */
+    var hint = container.querySelector(".pwc-dm-thread-hint");
+    if (hint) hint.remove();
+
+    messages.forEach(function (msg) {
+      var dateLabel = formatDate(msg.created_at);
+      if (dateLabel !== lastRenderedDate) {
+        lastRenderedDate = dateLabel;
+        var divider = document.createElement("div");
+        divider.className = "pwc-dm-date-divider";
+        divider.innerHTML = "<span>" + escapeHtml(dateLabel) + "</span>";
+        container.appendChild(divider);
+      }
+
+      var isMine = msg.sender_id === currentUser.id;
+      var wrap   = document.createElement("div");
+      wrap.className = "pwc-dm-bubble-wrap " + (isMine ? "mine" : "theirs");
+      wrap.innerHTML =
+        '<div class="pwc-dm-bubble">'      + escapeHtml(msg.body)       + "</div>" +
+        '<div class="pwc-dm-bubble-time">' + formatTime(msg.created_at) + "</div>";
+      container.appendChild(wrap);
+    });
+
+    container.scrollTop = container.scrollHeight;
+  }
+
   /* ── Active conversation ─────────────────────────────────────────────── */
 
   function openConvo(contact) {
-    activeContact = contact;
+    activeContact    = contact;
+    lastRenderedDate = null;
 
     el("convoAvatar").textContent = userInitials(contact);
     el("convoName").textContent   = userDisplayName(contact);
@@ -145,7 +214,7 @@ var ProfileMessages = (function () {
 
     renderDmList(el("dmSearch") ? el("dmSearch").value : "");
 
-    /* Load thread from API */
+    /* Load full thread from API */
     FriendsAPI.getThread(contact.id)
       .then(function (data) {
         threadCache[contact.id] = data.messages || [];
@@ -153,7 +222,6 @@ var ProfileMessages = (function () {
         /* Mark as read */
         FriendsAPI.markRead(contact.id)
           .then(function () {
-            /* Update unread count in conversation list */
             conversations.forEach(function (c) {
               if (c.user.id === contact.id) c.unread_count = 0;
             });
@@ -172,7 +240,6 @@ var ProfileMessages = (function () {
 
   /* Open a conversation by user ID — called from Friends page "Message" button */
   function openConvoById(userId, userInfo) {
-    /* Check if we already have a conversation with this user */
     var existing = null;
     for (var i = 0; i < conversations.length; i++) {
       if (conversations[i].user.id === userId) { existing = conversations[i].user; break; }
@@ -181,7 +248,6 @@ var ProfileMessages = (function () {
       openConvo(existing);
       return;
     }
-    /* New conversation — use the provided user info */
     if (userInfo) {
       openConvo(userInfo);
     }
@@ -191,6 +257,7 @@ var ProfileMessages = (function () {
     var container = el("dmMessages");
     if (!container) return;
     container.innerHTML = "";
+    lastRenderedDate = null;
 
     if (!messages || messages.length === 0) {
       var hint = document.createElement("div");
@@ -200,11 +267,10 @@ var ProfileMessages = (function () {
       return;
     }
 
-    var lastDate = null;
     messages.forEach(function (msg) {
       var dateLabel = formatDate(msg.created_at);
-      if (dateLabel !== lastDate) {
-        lastDate = dateLabel;
+      if (dateLabel !== lastRenderedDate) {
+        lastRenderedDate = dateLabel;
         var divider = document.createElement("div");
         divider.className = "pwc-dm-date-divider";
         divider.innerHTML = "<span>" + escapeHtml(dateLabel) + "</span>";
@@ -226,11 +292,12 @@ var ProfileMessages = (function () {
   /* ── Send message ────────────────────────────────────────────────────── */
 
   function sendMessage() {
-    if (!activeContact) return;
+    if (!activeContact || isSending) return;
     var input = el("dmInput");
     var text  = input.value.trim();
     if (!text) return;
 
+    isSending = true;
     var sendBtn = el("dmSend");
     if (sendBtn) sendBtn.disabled = true;
 
@@ -239,18 +306,17 @@ var ProfileMessages = (function () {
         input.value        = "";
         input.style.height = "";
 
-        /* Append new message to cache and re-render */
         if (!threadCache[activeContact.id]) threadCache[activeContact.id] = [];
         threadCache[activeContact.id].push(msg);
-        renderMessages(threadCache[activeContact.id]);
+        appendMessages([msg]);
 
-        /* Refresh conversation list to update preview */
         loadConversations();
       })
       .catch(function (err) {
         alert(err.message || "Could not send message.");
       })
       .finally(function () {
+        isSending = false;
         if (sendBtn) sendBtn.disabled = false;
       });
   }
@@ -287,10 +353,16 @@ var ProfileMessages = (function () {
     bindEvents();
     loadConversations();
     updateUnreadBadge();
+    startPoll();
+  }
+
+  function destroy() {
+    stopPoll();
   }
 
   return {
     init:              init,
+    destroy:           destroy,
     openConvoById:     openConvoById,
     renderDmList:      renderDmList,
     updateUnreadBadge: updateUnreadBadge,
