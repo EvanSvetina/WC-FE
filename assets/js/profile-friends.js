@@ -293,7 +293,7 @@ var ProfileFriends = (function () {
   function wireSearchActions(li, u, actionsId) {
     var addBtn    = li.querySelector('[data-search-add]');
     var acceptBtn = li.querySelector('[data-search-accept]');
-    var actionsEl = el(actionsId);
+    var actionsEl = li.querySelector('#' + actionsId);
 
     if (addBtn) {
       addBtn.addEventListener("click", function () {
