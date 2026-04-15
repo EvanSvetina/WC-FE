@@ -302,9 +302,9 @@ var ProfileFriends = (function () {
           .then(function () {
             actionsEl.innerHTML = '<button class="pwc-btn pwc-btn-border pwc-btn-sm" disabled>Request Sent</button>';
           })
-          .catch(function (err) {
-            addBtn.disabled = false;
-            alert(err.message);
+          .catch(function () {
+            /* Treat any failure (including "already pending") as sent */
+            actionsEl.innerHTML = '<button class="pwc-btn pwc-btn-border pwc-btn-sm" disabled>Request Sent</button>';
           });
       });
     }
