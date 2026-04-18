@@ -29,18 +29,18 @@ show_reading_time: false
   <nav class="pwc-topbar">
     <div class="pwc-topbar-brand">PWC</div>
     <div class="pwc-topbar-tabs">
-      <button class="pwc-topbar-tab active" data-view="home">Home</button>
-      <button class="pwc-topbar-tab" data-view="blog">Blog</button>
-      <button class="pwc-topbar-tab" data-view="groups">Groups</button>
-      <button class="pwc-topbar-tab" data-view="friends">
+      <button class="pwc-topbar-tab active" data-view="home" title="Toggle Home panel">Home</button>
+      <button class="pwc-topbar-tab" data-view="blog" title="Toggle Blog panel">Blog</button>
+      <button class="pwc-topbar-tab" data-view="groups" title="Toggle Groups panel">Groups</button>
+      <button class="pwc-topbar-tab" data-view="friends" title="Toggle Friends panel">
         Friends
         <span class="pwc-topbar-badge" id="friendRequestBadge" style="display:none;">0</span>
       </button>
-      <button class="pwc-topbar-tab" data-view="messages">
+      <button class="pwc-topbar-tab" data-view="messages" title="Toggle Messages panel">
         Messages
         <span class="pwc-topbar-badge" id="unreadBadge" style="display:none;">0</span>
       </button>
-      <button class="pwc-topbar-tab" data-view="events">Events</button>
+      <button class="pwc-topbar-tab" data-view="events" title="Toggle Events panel">Events</button>
     </div>
     <div class="pwc-topbar-user">
       <span id="topbarName"></span>
@@ -51,192 +51,223 @@ show_reading_time: false
     </div>
   </nav>
 
-  <!-- ═══════════════════════════════════════════════ -->
-  <!-- VIEW: HOME                                      -->
-  <!-- ═══════════════════════════════════════════════ -->
-  <div class="pwc-view pwc-view--home active" id="view-home">
-    <div class="pwc-social-home">
+  <!-- ══════════════════════════════════════════════════════════
+       PANEL GRID — multiple panels can be open at once
+       ══════════════════════════════════════════════════════════ -->
+  <div class="pwc-panel-grid" id="pwc-panel-grid">
 
-      <div class="pwc-social-welcome">
-        <div class="pwc-social-welcome-avatar" id="homeAvatar">—</div>
-        <div class="pwc-social-welcome-text">
-          <h1>Welcome back, <span id="homeName">…</span>!</h1>
-          <span class="pwc-social-role-badge" id="homeRole"></span>
-        </div>
+    <!-- ─── HOME ─── -->
+    <div class="pwc-panel pwc-panel--home open" id="panel-home">
+      <div class="pwc-panel-header">
+        <span class="pwc-panel-title">Home</span>
+        <button class="pwc-panel-close" data-panel="home" title="Close panel">×</button>
       </div>
+      <div class="pwc-panel-body">
+        <div class="pwc-social-home">
 
-      <div class="pwc-social-widgets">
-        <button class="pwc-social-widget" data-goto="groups">
-          <div class="pwc-social-widget-num" id="homeGroupCount">—</div>
-          <div class="pwc-social-widget-label">My Groups</div>
-        </button>
-        <button class="pwc-social-widget" data-goto="friends">
-          <div class="pwc-social-widget-num" id="homeFriendCount">—</div>
-          <div class="pwc-social-widget-label">Friends</div>
-        </button>
-        <button class="pwc-social-widget" data-goto="messages">
-          <div class="pwc-social-widget-num" id="homeUnreadCount">—</div>
-          <div class="pwc-social-widget-label">Unread Messages</div>
-        </button>
-        <button class="pwc-social-widget" data-goto="events">
-          <div class="pwc-social-widget-num" id="homeEventCount">—</div>
-          <div class="pwc-social-widget-label">Upcoming Events</div>
-        </button>
-      </div>
-
-      <div class="pwc-social-section" id="homeGroupsSection">
-        <h2>My Groups</h2>
-        <div id="homeGroupsList" class="pwc-social-group-chips"></div>
-      </div>
-
-      <div class="pwc-social-section" id="homePendingSection" style="display:none;">
-        <h2>Friend Requests</h2>
-        <div id="homePendingList" class="pwc-social-pending-list"></div>
-      </div>
-
-      <div class="pwc-social-section">
-        <h2>Suggested for You</h2>
-        <p class="pwc-social-ml-desc">
-          The server scores upcoming events and groups you haven't joined yet against your bio, interests, and languages
-          using <strong>TF-IDF</strong> and <strong>cosine similarity</strong>.
-        </p>
-        <div class="pwc-form-actions">
-          <button type="button" class="pwc-btn pwc-btn-fill" id="pwcMlRecBtn">Run recommendation engine</button>
-          <span class="pwc-save-msg" id="pwcMlRecMsg"></span>
-        </div>
-        <div id="pwcMlRecOutput" class="pwc-ml-rec-output" hidden></div>
-      </div>
-
-      <div class="pwc-social-section" style="text-align:right;">
-        <a href="{{ site.baseurl }}/navigation/settings" class="pwc-btn pwc-btn-border" style="font-size:0.85rem;">Account Settings</a>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════ -->
-  <!-- VIEW: BLOG                                      -->
-  <!-- ═══════════════════════════════════════════════ -->
-  <div class="pwc-view pwc-view--blog" id="view-blog">
-    <div class="pwc-blog-page">
-      <div class="pwc-blog-header">
-        <div class="pwc-blog-header-text">
-          <h1>Club Blog</h1>
-          <p>News, recaps, spotlights, and community updates from our members.</p>
-        </div>
-        <button class="pwc-btn pwc-btn-sage pwc-blog-new-btn" id="blog-new-btn" style="display:none;" onclick="Blog.showCompose()">+ New Post</button>
-      </div>
-      <div class="pwc-blog-toolbar">
-        <div class="pwc-blog-search-wrap">
-          <svg class="pwc-blog-search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="blog-search" class="pwc-blog-search" placeholder="Search posts..." autocomplete="off">
-        </div>
-        <div class="pwc-blog-filters">
-          <select id="blog-filter-author" class="pwc-blog-select"><option value="">All Authors</option></select>
-          <button class="pwc-blog-filter-btn" id="blog-filter-pinned" title="Show pinned only">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 L12 12 M12 12 L17 7 M12 12 L7 7 M5 22 L19 22 M12 12 L12 22"/></svg>
-            Pinned
-          </button>
-        </div>
-      </div>
-      <div id="blog-posts" class="pwc-blog-list"><div class="pwc-blog-loading">Loading posts...</div></div>
-      <div id="blog-pagination" class="pwc-blog-pagination" style="display:none;"></div>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════ -->
-  <!-- VIEW: GROUPS                                    -->
-  <!-- ═══════════════════════════════════════════════ -->
-  <div class="pwc-view pwc-view--groups" id="view-groups">
-    <div class="pwc-groups-page">
-      <div class="pwc-blog-header">
-        <div class="pwc-blog-header-text">
-          <h1>Groups</h1>
-          <p>Join groups to connect with members who share your interests and see group-exclusive content.</p>
-        </div>
-        <button class="pwc-btn pwc-btn-sage pwc-blog-new-btn" id="groups-new-btn" style="display:none;" onclick="Groups.showCreate()">+ New Group</button>
-      </div>
-      <div id="groups-list" class="pwc-groups-list"><div class="pwc-blog-loading">Loading groups...</div></div>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════ -->
-  <!-- VIEW: FRIENDS                                   -->
-  <!-- ═══════════════════════════════════════════════ -->
-  <div class="pwc-view pwc-view--friends" id="view-friends">
-    <div class="pwc-friends-wrap">
-      <div class="pwc-friends-header">
-        <h1>Friends</h1>
-        <p>Manage your connections and respond to pending requests.</p>
-        <hr class="pwc-rule">
-      </div>
-      <div class="pwc-friends-search-wrap">
-        <input type="text" id="friendSearchInput" class="pwc-friends-search" placeholder="Search members by username…" autocomplete="off">
-        <div id="friendSearchResults" class="pwc-friends-search-results" hidden></div>
-      </div>
-      <div id="friends-view-content"></div>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════ -->
-  <!-- VIEW: MESSAGES                                  -->
-  <!-- ═══════════════════════════════════════════════ -->
-  <div class="pwc-view pwc-view--messages" id="view-messages">
-    <div class="pwc-dm-layout">
-      <aside class="pwc-dm-sidebar">
-        <div class="pwc-dm-sidebar-header"><h2>Messages</h2></div>
-        <div class="pwc-dm-search-wrap">
-          <input type="text" id="dmSearch" class="pwc-dm-search" placeholder="Search members…">
-        </div>
-        <ul class="pwc-dm-list" id="dmList"></ul>
-      </aside>
-      <div class="pwc-dm-chat" id="dmChat">
-        <div class="pwc-dm-empty" id="dmEmpty">
-          <p>Select a conversation to start messaging</p>
-        </div>
-        <div class="pwc-dm-convo" id="dmConvo" style="display:none;">
-          <div class="pwc-dm-convo-header">
-            <div class="pwc-dm-convo-avatar" id="convoAvatar">—</div>
-            <div>
-              <div class="pwc-dm-convo-name" id="convoName">—</div>
-              <div class="pwc-dm-convo-status" id="convoStatus">Member</div>
+          <div class="pwc-social-welcome">
+            <div class="pwc-social-welcome-avatar" id="homeAvatar">—</div>
+            <div class="pwc-social-welcome-text">
+              <h1>Welcome back, <span id="homeName">…</span>!</h1>
+              <span class="pwc-social-role-badge" id="homeRole"></span>
             </div>
           </div>
-          <div class="pwc-dm-messages" id="dmMessages"></div>
-          <div class="pwc-dm-composer">
-            <textarea id="dmInput" class="pwc-dm-input" placeholder="Write a message…" rows="1"></textarea>
-            <button class="pwc-dm-send" id="dmSend" type="button">Send</button>
+
+          <div class="pwc-social-widgets">
+            <button class="pwc-social-widget" data-goto="groups">
+              <div class="pwc-social-widget-num" id="homeGroupCount">—</div>
+              <div class="pwc-social-widget-label">My Groups</div>
+            </button>
+            <button class="pwc-social-widget" data-goto="friends">
+              <div class="pwc-social-widget-num" id="homeFriendCount">—</div>
+              <div class="pwc-social-widget-label">Friends</div>
+            </button>
+            <button class="pwc-social-widget" data-goto="messages">
+              <div class="pwc-social-widget-num" id="homeUnreadCount">—</div>
+              <div class="pwc-social-widget-label">Unread Messages</div>
+            </button>
+            <button class="pwc-social-widget" data-goto="events">
+              <div class="pwc-social-widget-num" id="homeEventCount">—</div>
+              <div class="pwc-social-widget-label">Upcoming Events</div>
+            </button>
+          </div>
+
+          <div class="pwc-social-section" id="homeGroupsSection">
+            <h2>My Groups</h2>
+            <div id="homeGroupsList" class="pwc-social-group-chips"></div>
+          </div>
+
+          <div class="pwc-social-section" id="homePendingSection" style="display:none;">
+            <h2>Friend Requests</h2>
+            <div id="homePendingList" class="pwc-social-pending-list"></div>
+          </div>
+
+          <div class="pwc-social-section">
+            <h2>Suggested for You</h2>
+            <p class="pwc-social-ml-desc">
+              The server scores upcoming events and groups you haven't joined yet against your bio, interests, and languages
+              using <strong>TF-IDF</strong> and <strong>cosine similarity</strong>.
+            </p>
+            <div class="pwc-form-actions">
+              <button type="button" class="pwc-btn pwc-btn-fill" id="pwcMlRecBtn">Run recommendation engine</button>
+              <span class="pwc-save-msg" id="pwcMlRecMsg"></span>
+            </div>
+            <div id="pwcMlRecOutput" class="pwc-ml-rec-output" hidden></div>
+          </div>
+
+          <div class="pwc-social-section" style="text-align:right;">
+            <a href="{{ site.baseurl }}/navigation/settings" class="pwc-btn pwc-btn-border" style="font-size:0.85rem;">Account Settings</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── BLOG ─── -->
+    <div class="pwc-panel pwc-panel--blog" id="panel-blog">
+      <div class="pwc-panel-header">
+        <span class="pwc-panel-title">Blog</span>
+        <button class="pwc-panel-close" data-panel="blog" title="Close panel">×</button>
+      </div>
+      <div class="pwc-panel-body">
+        <div class="pwc-blog-page">
+          <div class="pwc-blog-header">
+            <div class="pwc-blog-header-text">
+              <h1>Club Blog</h1>
+              <p>News, recaps, spotlights, and community updates from our members.</p>
+            </div>
+            <button class="pwc-btn pwc-btn-sage pwc-blog-new-btn" id="blog-new-btn" style="display:none;" onclick="Blog.showCompose()">+ New Post</button>
+          </div>
+          <div class="pwc-blog-toolbar">
+            <div class="pwc-blog-search-wrap">
+              <svg class="pwc-blog-search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="blog-search" class="pwc-blog-search" placeholder="Search posts..." autocomplete="off">
+            </div>
+            <div class="pwc-blog-filters">
+              <select id="blog-filter-author" class="pwc-blog-select"><option value="">All Authors</option></select>
+              <button class="pwc-blog-filter-btn" id="blog-filter-pinned" title="Show pinned only">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 L12 12 M12 12 L17 7 M12 12 L7 7 M5 22 L19 22 M12 12 L12 22"/></svg>
+                Pinned
+              </button>
+            </div>
+          </div>
+          <div id="blog-posts" class="pwc-blog-list"><div class="pwc-blog-loading">Loading posts...</div></div>
+          <div id="blog-pagination" class="pwc-blog-pagination" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── GROUPS ─── -->
+    <div class="pwc-panel pwc-panel--groups" id="panel-groups">
+      <div class="pwc-panel-header">
+        <span class="pwc-panel-title">Groups</span>
+        <button class="pwc-panel-close" data-panel="groups" title="Close panel">×</button>
+      </div>
+      <div class="pwc-panel-body">
+        <div class="pwc-groups-page">
+          <div class="pwc-blog-header">
+            <div class="pwc-blog-header-text">
+              <h1>Groups</h1>
+              <p>Join groups to connect with members who share your interests and see group-exclusive content.</p>
+            </div>
+            <button class="pwc-btn pwc-btn-sage pwc-blog-new-btn" id="groups-new-btn" style="display:none;" onclick="Groups.showCreate()">+ New Group</button>
+          </div>
+          <div id="groups-list" class="pwc-groups-list"><div class="pwc-blog-loading">Loading groups...</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── FRIENDS ─── -->
+    <div class="pwc-panel pwc-panel--friends" id="panel-friends">
+      <div class="pwc-panel-header">
+        <span class="pwc-panel-title">Friends</span>
+        <button class="pwc-panel-close" data-panel="friends" title="Close panel">×</button>
+      </div>
+      <div class="pwc-panel-body">
+        <div class="pwc-friends-wrap">
+          <div class="pwc-friends-header">
+            <h1>Friends</h1>
+            <p>Manage your connections and respond to pending requests.</p>
+            <hr class="pwc-rule">
+          </div>
+          <div class="pwc-friends-search-wrap">
+            <input type="text" id="friendSearchInput" class="pwc-friends-search" placeholder="Search members by username…" autocomplete="off">
+            <div id="friendSearchResults" class="pwc-friends-search-results" hidden></div>
+          </div>
+          <div id="friends-view-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── MESSAGES ─── -->
+    <div class="pwc-panel pwc-panel--messages" id="panel-messages">
+      <div class="pwc-panel-header">
+        <span class="pwc-panel-title">Messages</span>
+        <button class="pwc-panel-close" data-panel="messages" title="Close panel">×</button>
+      </div>
+      <div class="pwc-panel-body pwc-panel-body--messages">
+        <div class="pwc-dm-layout">
+          <aside class="pwc-dm-sidebar">
+            <div class="pwc-dm-sidebar-header"><h2>Messages</h2></div>
+            <div class="pwc-dm-search-wrap">
+              <input type="text" id="dmSearch" class="pwc-dm-search" placeholder="Search members…">
+            </div>
+            <ul class="pwc-dm-list" id="dmList"></ul>
+          </aside>
+          <div class="pwc-dm-chat" id="dmChat">
+            <div class="pwc-dm-empty" id="dmEmpty">
+              <p>Select a conversation to start messaging</p>
+            </div>
+            <div class="pwc-dm-convo" id="dmConvo" style="display:none;">
+              <div class="pwc-dm-convo-header">
+                <div class="pwc-dm-convo-avatar" id="convoAvatar">—</div>
+                <div>
+                  <div class="pwc-dm-convo-name" id="convoName">—</div>
+                  <div class="pwc-dm-convo-status" id="convoStatus">Member</div>
+                </div>
+              </div>
+              <div class="pwc-dm-messages" id="dmMessages"></div>
+              <div class="pwc-dm-composer">
+                <textarea id="dmInput" class="pwc-dm-input" placeholder="Write a message…" rows="1"></textarea>
+                <button class="pwc-dm-send" id="dmSend" type="button">Send</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ═══════════════════════════════════════════════ -->
-  <!-- VIEW: EVENTS                                    -->
-  <!-- ═══════════════════════════════════════════════ -->
-  <div class="pwc-view pwc-view--events" id="view-events">
-    <div class="pwc-blog-page">
-      <div class="pwc-blog-header">
-        <div class="pwc-blog-header-text">
-          <h1>Events</h1>
-          <p>Club meetings and community events. Click an event to RSVP, click a date to schedule a meeting.</p>
+    <!-- ─── EVENTS ─── -->
+    <div class="pwc-panel pwc-panel--events" id="panel-events">
+      <div class="pwc-panel-header">
+        <span class="pwc-panel-title">Events</span>
+        <button class="pwc-panel-close" data-panel="events" title="Close panel">×</button>
+      </div>
+      <div class="pwc-panel-body">
+        <div class="pwc-blog-page">
+          <div class="pwc-blog-header">
+            <div class="pwc-blog-header-text">
+              <h1>Events</h1>
+              <p>Club meetings and community events. Click an event to RSVP, click a date to schedule a meeting.</p>
+            </div>
+          </div>
+          <div id="pwc-events-group-filter" class="pwc-events-filter-bar" style="display:none;">
+            <label for="pwc-events-group-select" style="font-weight:600; font-size:0.9rem; color:var(--pwc-muted);">Filter by group:</label>
+            <select id="pwc-events-group-select" class="pwc-blog-select" style="max-width:220px;">
+              <option value="">All Events</option>
+            </select>
+          </div>
+          <div id="pwc-events-calendar" aria-label="Events calendar"></div>
         </div>
       </div>
-      <div id="pwc-events-group-filter" class="pwc-events-filter-bar" style="display:none;">
-        <label for="pwc-events-group-select" style="font-weight:600; font-size:0.9rem; color:var(--pwc-muted);">Filter by group:</label>
-        <select id="pwc-events-group-select" class="pwc-blog-select" style="max-width:220px;">
-          <option value="">All Events</option>
-        </select>
-      </div>
-      <div id="pwc-events-calendar" aria-label="Events calendar"></div>
     </div>
-  </div>
+
+  </div><!-- /#pwc-panel-grid -->
 
 </div><!-- /#pwc-social-app -->
 
 <!-- ══════════════════════════════════════════════════════════
-     OVERLAYS (shared, outside tab containers)
+     OVERLAYS (shared, outside panel containers)
      ══════════════════════════════════════════════════════════ -->
 
 <!-- Blog compose -->
@@ -423,10 +454,97 @@ show_reading_time: false
 
 <!-- Social page styles -->
 <style>
+/* ── Panel grid layout ─────────────────────────────────── */
+.pwc-panel-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem 1.25rem 2rem;
+  align-items: flex-start;
+}
+
+.pwc-panel {
+  flex: 1 1 480px;
+  min-width: 320px;
+  border: 1px solid var(--pwc-border);
+  border-radius: 12px;
+  background: var(--pwc-white);
+  display: none;
+  flex-direction: column;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  overflow: hidden;
+}
+.pwc-panel.open { display: flex; }
+
+.pwc-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: var(--pwc-sage-light);
+  border-bottom: 1px solid var(--pwc-border);
+  flex-shrink: 0;
+}
+.pwc-panel-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--pwc-sage-dark);
+}
+.pwc-panel-close {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--pwc-muted);
+  cursor: pointer;
+  padding: 0 0.15rem;
+  transition: color 0.12s;
+}
+.pwc-panel-close:hover { color: var(--pwc-charcoal); }
+
+.pwc-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* Messages panel needs a fixed height so the DM layout works */
+.pwc-panel--messages {
+  flex: 2 1 600px;
+  min-height: 520px;
+  max-height: min(680px, 80vh);
+}
+.pwc-panel-body--messages {
+  height: 100%;
+  overflow: hidden;
+}
+.pwc-panel--messages .pwc-dm-layout {
+  height: 100%;
+}
+
+/* Events panel — give calendar room */
+.pwc-panel--events {
+  flex: 2 1 700px;
+}
+
+/* Home panel — slightly wider preference */
+.pwc-panel--home {
+  flex: 1.5 1 520px;
+}
+
+/* ── Topbar tab active = panel is open ─────────────────── */
+.pwc-topbar-tab.active {
+  background: var(--pwc-sage) !important;
+  color: #fff !important;
+}
+
+/* ── Home panel inner styles ───────────────────────────── */
 .pwc-social-home {
   max-width: 900px;
   margin: 0 auto;
-  padding: 2rem 1.5rem 3rem;
+  padding: 1.5rem 1.5rem 2rem;
 }
 .pwc-social-welcome {
   display: flex;
@@ -472,6 +590,7 @@ show_reading_time: false
 @media (max-width: 680px) {
   .pwc-social-widgets { grid-template-columns: repeat(2, 1fr); }
   .pwc-social-welcome-text h1 { font-size: 1.2rem; }
+  .pwc-panel { flex: 1 1 100%; min-width: 0; }
 }
 .pwc-social-widget {
   background: var(--pwc-white);
@@ -580,7 +699,7 @@ show_reading_time: false
   if (textEl)  textEl.textContent  = initials;
   if (imgEl && currentUser.avatar_url) { imgEl.src = currentUser.avatar_url; imgEl.hidden = false; if (textEl) textEl.style.display = "none"; }
 
-  /* ── Populate home tab ────────────────────────────────────── */
+  /* ── Populate home panel ──────────────────────────────────── */
   var homeAvatarEl = document.getElementById("homeAvatar");
   if (homeAvatarEl) {
     if (currentUser.avatar_url) {
@@ -596,20 +715,40 @@ show_reading_time: false
     homeRoleEl.textContent = currentUser.role === "admin" ? "Admin" : (currentUser.is_active_member ? "Active Member" : "Member");
   }
 
-  /* ── Tab switching ────────────────────────────────────────── */
-  var views    = document.querySelectorAll(".pwc-view");
+  /* ── Panel toggle system ──────────────────────────────────── */
   var tabBtns  = document.querySelectorAll(".pwc-topbar-tab");
   var calendarReady = false;
   var friendsReady  = false;
   var messagesReady = false;
 
-  function switchView(name) {
-    tabBtns.forEach(function (b) { b.classList.toggle("active", b.dataset.view === name); });
-    views.forEach(function (v) {
-      var matches = v.classList.contains("pwc-view--" + name);
-      v.classList.toggle("active", matches);
-      v.style.display = matches ? "" : "none";
-    });
+  function openPanel(name) {
+    var panel = document.getElementById("panel-" + name);
+    if (!panel) return;
+    panel.classList.add("open");
+    var btn = document.querySelector('.pwc-topbar-tab[data-view="' + name + '"]');
+    if (btn) btn.classList.add("active");
+    lazyInit(name);
+  }
+
+  function closePanel(name) {
+    var panel = document.getElementById("panel-" + name);
+    if (!panel) return;
+    panel.classList.remove("open");
+    var btn = document.querySelector('.pwc-topbar-tab[data-view="' + name + '"]');
+    if (btn) btn.classList.remove("active");
+  }
+
+  function togglePanel(name) {
+    var panel = document.getElementById("panel-" + name);
+    if (!panel) return;
+    if (panel.classList.contains("open")) {
+      closePanel(name);
+    } else {
+      openPanel(name);
+    }
+  }
+
+  function lazyInit(name) {
     if (name === "events" && !calendarReady) {
       calendarReady = true;
       if (window.initSocialCalendar) window.initSocialCalendar();
@@ -624,27 +763,31 @@ show_reading_time: false
     }
   }
 
-  /* expose for widget onclick buttons */
-  window.socialSwitchView = switchView;
+  /* expose for widget onclick buttons — always opens (never closes) */
+  window.socialSwitchView = openPanel;
 
+  /* Tab buttons toggle panels */
   tabBtns.forEach(function (btn) {
-    btn.addEventListener("click", function () { switchView(btn.dataset.view); });
+    btn.addEventListener("click", function () { togglePanel(btn.dataset.view); });
   });
 
-  /* Initialize non-lazy tabs that auto-init via DOMContentLoaded */
-  /* Blog and Groups initialize themselves when their scripts load */
-
-  /* Hide non-active views on init */
-  views.forEach(function (v) {
-    if (!v.classList.contains("active")) v.style.display = "none";
+  /* Panel close buttons */
+  document.querySelectorAll(".pwc-panel-close").forEach(function (btn) {
+    btn.addEventListener("click", function () { closePanel(btn.dataset.panel); });
   });
 
-  /* Widget buttons → switch view */
+  /* Widget buttons → open that panel */
   document.querySelectorAll(".pwc-social-widget[data-goto]").forEach(function (btn) {
-    btn.addEventListener("click", function () { switchView(btn.dataset.goto); });
+    btn.addEventListener("click", function () { openPanel(btn.dataset.goto); });
   });
 
-  /* ── Home tab: load data ──────────────────────────────────── */
+  /* Group chips on home → open groups panel */
+  /* (chips are dynamic, handled via event delegation) */
+  document.getElementById("homeGroupsList") && document.getElementById("homeGroupsList").addEventListener("click", function (e) {
+    if (e.target.classList.contains("pwc-social-group-chip")) openPanel("groups");
+  });
+
+  /* ── Home panel: load data ────────────────────────────────── */
   var API_BASE = (window.PWC_API_BASE_URL || "").replace(/\/$/, "");
 
   /* Friends count + pending requests */
@@ -658,7 +801,6 @@ show_reading_time: false
     var badge = document.getElementById("friendRequestBadge");
     if (badge && pending.length) { badge.style.display = ""; badge.textContent = pending.length; }
 
-    /* show pending section on home */
     if (pending.length) {
       var sec = document.getElementById("homePendingSection");
       if (sec) sec.style.display = "";
@@ -715,7 +857,6 @@ show_reading_time: false
             var chip = document.createElement("button");
             chip.className = "pwc-social-group-chip";
             chip.textContent = grp.name;
-            chip.addEventListener("click", function () { switchView("groups"); });
             listEl.appendChild(chip);
           });
         }
