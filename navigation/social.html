@@ -270,6 +270,8 @@ show_reading_time: false
 
   </div><!-- /#pwc-panel-grid -->
 
+  <div id="pwc-panel-toast"></div>
+
 </div><!-- /#pwc-social-app -->
 
 <!-- ══════════════════════════════════════════════════════════
@@ -542,6 +544,28 @@ show_reading_time: false
 .pwc-panel.drop-before { box-shadow: -4px 0 0 var(--pwc-sage), var(--pwc-shadow-sm); }
 .pwc-panel.drop-after  { box-shadow:  4px 0 0 var(--pwc-sage), var(--pwc-shadow-sm); }
 
+/* ── Panel limit toast ──────────────────────────────────── */
+#pwc-panel-toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(1rem);
+  background: #333;
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 9999;
+}
+#pwc-panel-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 .pwc-panel-body {
   flex: 1;
   overflow-y: auto;
@@ -751,9 +775,29 @@ show_reading_time: false
   var friendsReady  = false;
   var messagesReady = false;
 
+  var MAX_PANELS = 3;
+
+  function countOpen() {
+    return document.querySelectorAll(".pwc-panel.open").length;
+  }
+
+  function showPanelToast(msg) {
+    var t = document.getElementById("pwc-panel-toast");
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add("visible");
+    clearTimeout(t._tid);
+    t._tid = setTimeout(function () { t.classList.remove("visible"); }, 2800);
+  }
+
   function openPanel(name) {
     var panel = document.getElementById("panel-" + name);
     if (!panel) return;
+    if (panel.classList.contains("open")) return; // already open, no-op
+    if (countOpen() >= MAX_PANELS) {
+      showPanelToast("Close a panel first — only " + MAX_PANELS + " can be open at once.");
+      return;
+    }
     panel.classList.add("open");
     var btn = document.querySelector('.pwc-topbar-tab[data-view="' + name + '"]');
     if (btn) btn.classList.add("active");
@@ -873,6 +917,28 @@ show_reading_time: false
     grid.querySelectorAll(".pwc-panel-close").forEach(function (btn) {
       btn.addEventListener("mousedown", function (e) { e.stopPropagation(); });
     });
+  })();
+
+  /* ── Two-finger / trackpad scroll on the panel grid ─────── */
+  /* Panel bodies consume wheel events first; re-emit them on the
+     grid so the grid itself scrolls when the cursor is over a panel
+     body but the panel body is already at its scroll limit.        */
+  (function () {
+    var grid = document.getElementById("pwc-panel-grid");
+    grid.addEventListener("wheel", function (e) {
+      /* Only intercept if the target is a panel body that's already
+         at its scroll boundary in the direction being scrolled.    */
+      var body = e.target.closest(".pwc-panel-body");
+      if (!body) return; // cursor is directly on the grid — default is fine
+      var atTop    = body.scrollTop === 0;
+      var atBottom = body.scrollTop + body.clientHeight >= body.scrollHeight - 1;
+      var scrollingUp   = e.deltaY < 0;
+      var scrollingDown = e.deltaY > 0;
+      if ((scrollingUp && atTop) || (scrollingDown && atBottom)) {
+        e.preventDefault();
+        grid.scrollTop += e.deltaY;
+      }
+    }, { passive: false });
   })();
 
   /* Group chips on home → open groups panel */
