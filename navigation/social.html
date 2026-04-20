@@ -116,8 +116,48 @@ show_reading_time: false
             <div id="pwcMlRecOutput" class="pwc-ml-rec-output" hidden></div>
           </div>
 
-          <div class="pwc-social-section" style="text-align:right;">
+          <!-- ── Edit Profile ─────────────────────────────── -->
+          <div class="pwc-social-section">
+            <h2>Edit Profile</h2>
+            <div class="pwc-form-group">
+              <label for="homeBio">Bio</label>
+              <textarea id="homeBio" rows="3" placeholder="Tell your fellow members a little about yourself…" style="width:100%;resize:vertical;"></textarea>
+            </div>
+            <div class="pwc-form-group">
+              <label>Languages Spoken</label>
+              <div class="pwc-tag-input-wrap">
+                <div class="pwc-tag-chips" id="homeLangChips"></div>
+                <input type="text" id="homeLangInput" class="pwc-tag-input" placeholder="Type a language and press Enter">
+              </div>
+            </div>
+            <div class="pwc-form-group">
+              <label>Interests / Hobbies</label>
+              <div class="pwc-tag-input-wrap">
+                <div class="pwc-tag-chips" id="homeInterestChips"></div>
+                <input type="text" id="homeInterestInput" class="pwc-tag-input" placeholder="Type an interest and press Enter">
+              </div>
+            </div>
+            <div class="pwc-form-actions">
+              <span class="pwc-save-msg" id="homeSaveMsg"></span>
+              <button type="button" class="pwc-btn pwc-btn-fill" id="homeSaveBtn">Save Changes</button>
+            </div>
+          </div>
+
+          <!-- ── Appearance ────────────────────────────────── -->
+          <div class="pwc-social-section">
+            <h2>Cursor Style</h2>
+            <p style="font-size:0.82rem;color:#666;margin:0 0 0.6rem;">Your selection is saved across the site.</p>
+            <p class="pwc-cursor-group-label">Standard</p>
+            <div class="pwc-cursor-grid" id="homeCursorGridStandard"></div>
+            <p class="pwc-cursor-group-label pwc-cursor-group-label--themed">Site-Themed</p>
+            <div class="pwc-cursor-grid" id="homeCursorGridThemed"></div>
+            <span class="pwc-save-msg" id="homeCursorMsg"></span>
+          </div>
+
+          <!-- ── Sign Out ──────────────────────────────────── -->
+          <div class="pwc-social-section" style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
             <a href="{{ site.baseurl }}/navigation/settings" class="pwc-btn pwc-btn-border" style="font-size:0.85rem;">Account Settings</a>
+            <button type="button" class="pwc-logout-btn" id="homeLogoutBtn">Sign Out</button>
           </div>
 
         </div>
@@ -1056,6 +1096,140 @@ show_reading_time: false
         .finally(function () { mlBtn.disabled = false; });
     });
   }
+
+  /* ── Home panel: Edit Profile ────────────────────────────── */
+  (function () {
+    var homeLangTags     = (currentUser.languages || []).slice();
+    var homeInterestTags = (currentUser.interests  || []).slice();
+
+    function showMsg(msgEl, text, isError) {
+      if (!msgEl) return;
+      msgEl.textContent = text;
+      msgEl.className = "pwc-save-msg visible" + (isError ? " error" : "");
+      clearTimeout(msgEl._tid);
+      msgEl._tid = setTimeout(function () { msgEl.className = "pwc-save-msg"; }, 3000);
+    }
+
+    function renderChips(containerId, tags, useRose) {
+      var container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = "";
+      tags.forEach(function (tag, i) {
+        var chip  = document.createElement("span");
+        chip.className = "pwc-chip" + (useRose ? " pwc-chip--rose" : "");
+        var label = document.createElement("span"); label.textContent = tag;
+        var btn   = document.createElement("button");
+        btn.className = "pwc-chip-remove"; btn.textContent = "\u00d7"; btn.setAttribute("type","button");
+        btn.addEventListener("click", (function (idx, arr, cId, rose) {
+          return function () { arr.splice(idx, 1); renderChips(cId, arr, rose); };
+        })(i, tags, containerId, useRose));
+        chip.appendChild(label); chip.appendChild(btn); container.appendChild(chip);
+      });
+    }
+
+    function bindTagInput(inputId, tags, chipsId, useRose) {
+      var input = document.getElementById(inputId); if (!input) return;
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === ",") {
+          e.preventDefault();
+          var val = input.value.trim().replace(/,$/, "");
+          if (val && tags.indexOf(val) === -1) { tags.push(val); renderChips(chipsId, tags, useRose); }
+          input.value = "";
+        }
+        if (e.key === "Backspace" && !input.value && tags.length) { tags.pop(); renderChips(chipsId, tags, useRose); }
+      });
+    }
+
+    /* Fill form */
+    var bioEl = document.getElementById("homeBio");
+    if (bioEl) bioEl.value = currentUser.bio || "";
+    renderChips("homeLangChips",     homeLangTags,     false);
+    renderChips("homeInterestChips", homeInterestTags, true);
+    bindTagInput("homeLangInput",     homeLangTags,     "homeLangChips",     false);
+    bindTagInput("homeInterestInput", homeInterestTags, "homeInterestChips", true);
+
+    /* Save */
+    var saveBtn = document.getElementById("homeSaveBtn");
+    var saveMsg = document.getElementById("homeSaveMsg");
+    if (saveBtn) {
+      saveBtn.addEventListener("click", function () {
+        saveBtn.disabled = true;
+        ProfileAPI.updateProfile({
+          bio:       bioEl ? bioEl.value.trim() : "",
+          languages: homeLangTags.slice(),
+          interests: homeInterestTags.slice(),
+        })
+        .then(function (updated) {
+          Object.assign(currentUser, {
+            bio:       updated.bio       || "",
+            languages: updated.languages || [],
+            interests: updated.interests || [],
+          });
+          sessionStorage.setItem("pwc_user", JSON.stringify(currentUser));
+          showMsg(saveMsg, "Profile saved.", false);
+        })
+        .catch(function (err) { showMsg(saveMsg, err.message || "Failed to save.", true); })
+        .finally(function () { saveBtn.disabled = false; });
+      });
+    }
+  })();
+
+  /* ── Home panel: Cursor picker ───────────────────────────── */
+  (function () {
+    if (!window.CursorManager) return;
+    var saved = CursorManager.getSaved();
+    function showMsg(msgEl, text) {
+      if (!msgEl) return;
+      msgEl.textContent = text;
+      msgEl.className = "pwc-save-msg visible";
+      clearTimeout(msgEl._tid);
+      msgEl._tid = setTimeout(function () { msgEl.className = "pwc-save-msg"; }, 2000);
+    }
+    ["standard", "themed"].forEach(function (group) {
+      var containerId = "homeCursorGrid" + group.charAt(0).toUpperCase() + group.slice(1);
+      var container = document.getElementById(containerId);
+      if (!container) return;
+      CursorManager.CURSORS.filter(function (c) { return c.group === group; }).forEach(function (c) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "pwc-cursor-swatch" + (c.key === saved ? " active" : "");
+        btn.setAttribute("data-cursor", c.key);
+        btn.title = c.label;
+        var preview = document.createElement("div");
+        preview.className = "pwc-cursor-preview";
+        if (c.key === "default") {
+          preview.classList.add("pwc-cursor-preview--default");
+          preview.innerHTML = "<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28'><path d='M5 2 L5 22 L10 17 L13 25 L16 24 L13 16 L19 16 Z' fill='#555' stroke='#fff' stroke-width='1.5' stroke-linejoin='round'/></svg>";
+        } else if (c.isFlower) {
+          preview.innerHTML = "<span style='filter:drop-shadow(0 1px 2px rgba(0,0,0,0.25))'>" + CursorManager.buildFlowerSVG(c.fill, c.stroke, 36) + "</span>";
+        } else {
+          preview.style.background = c.key === "white" ? "#333333" : c.fill;
+          preview.innerHTML = "<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' style='filter:drop-shadow(0 1px 2px rgba(0,0,0,0.35))'><path d='M5 2 L5 22 L10 17 L13 25 L16 24 L13 16 L19 16 Z' fill='" + c.fill + "' stroke='" + c.stroke + "' stroke-width='1.5' stroke-linejoin='round'/></svg>";
+        }
+        var lbl = document.createElement("span"); lbl.className = "pwc-cursor-label"; lbl.textContent = c.label;
+        btn.appendChild(preview); btn.appendChild(lbl);
+        btn.addEventListener("click", function () {
+          document.querySelectorAll("#homeCursorGridStandard .pwc-cursor-swatch, #homeCursorGridThemed .pwc-cursor-swatch").forEach(function (b) { b.classList.remove("active"); });
+          btn.classList.add("active");
+          CursorManager.apply(c.key);
+          showMsg(document.getElementById("homeCursorMsg"), "Cursor saved.");
+        });
+        container.appendChild(btn);
+      });
+    });
+  })();
+
+  /* ── Home panel: Sign Out ────────────────────────────────── */
+  (function () {
+    var logoutBtn = document.getElementById("homeLogoutBtn");
+    if (!logoutBtn) return;
+    logoutBtn.addEventListener("click", function () {
+      sessionStorage.removeItem("pwc_user");
+      ProfileAPI.logout().finally(function () {
+        window.location.href = "{{ site.baseurl }}/navigation/settings";
+      });
+    });
+  })();
 
   /* ── Events calendar (lazy init) ─────────────────────────── */
   window.initSocialCalendar = (function () {
