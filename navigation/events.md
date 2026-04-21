@@ -258,7 +258,7 @@ show_reading_time: false
             allDay: false,
             backgroundColor: "rgba(196, 120, 138, 0.30)",
             borderColor: "rgba(196, 120, 138, 0.90)",
-            textColor: "#fbf8f6",
+            textColor: "#141414",
             extendedProps: {
               // No backend Event row for recurring meetings (we still allow public RSVP).
               backendEventId: "",
@@ -496,7 +496,7 @@ show_reading_time: false
             allDay: false,
             backgroundColor: bgColor,
             borderColor: bdrColor,
-            textColor: "#fbf8f6",
+            textColor: "#141414",
             extendedProps: {
               backendEventId: e.id,
               location: e.location || "",

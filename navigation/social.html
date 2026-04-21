@@ -16,7 +16,7 @@ show_reading_time: false
   <div class="pwc-gate-card">
     <h2>Member Portal</h2>
     <p>Sign in to access your groups, messages, friends, events, and the club blog.</p>
-    <a href="{{ site.baseurl }}/navigation/settings" class="pwc-btn pwc-btn-fill">Sign In</a>
+    <a href="{{ site.baseurl }}/navigation/login" class="pwc-btn pwc-btn-fill">Sign In</a>
   </div>
 </div>
 
@@ -1232,7 +1232,7 @@ show_reading_time: false
     logoutBtn.addEventListener("click", function () {
       sessionStorage.removeItem("pwc_user");
       ProfileAPI.logout().finally(function () {
-        window.location.href = "{{ site.baseurl }}/navigation/settings";
+        window.location.href = "{{ site.baseurl }}/navigation/login";
       });
     });
   })();
@@ -1288,7 +1288,7 @@ show_reading_time: false
           var dt = secondTuesday(y, m); dt.setHours(10,0,0,0);
           if (dt < now) continue;
           var end = new Date(dt.getTime() + 2*60*60*1000);
-          meetings.push({ title:"General Meeting — "+dt.toLocaleString(undefined,{month:"long"}), start:dt, end:end, allDay:false, backgroundColor:"rgba(196,120,138,0.30)", borderColor:"rgba(196,120,138,0.90)", textColor:"#fbf8f6", extendedProps:{ backendEventId:"", location:"Templars Hall, Old Poway Park" } });
+          meetings.push({ title:"General Meeting — "+dt.toLocaleString(undefined,{month:"long"}), start:dt, end:end, allDay:false, backgroundColor:"rgba(196,120,138,0.30)", borderColor:"rgba(196,120,138,0.90)", textColor:"#141414", extendedProps:{ backendEventId:"", location:"Templars Hall, Old Poway Park" } });
         }
       }
       return meetings;
@@ -1306,7 +1306,7 @@ show_reading_time: false
           var bg = cap.bg, bdr = cap.border;
           if (isGroup && isMine) { bg="rgba(201,160,112,0.45)"; bdr="rgba(201,160,112,0.92)"; }
           else if (isGroup) { bg="rgba(196,120,138,0.22)"; bdr="rgba(196,120,138,0.70)"; }
-          return { id:e.id, title:e.group_name?e.title+" ["+e.group_name+"]":e.title, start:e.start_time, end:e.end_time, allDay:false, backgroundColor:bg, borderColor:bdr, textColor:"#fbf8f6", extendedProps:{ backendEventId:e.id, location:e.location||"", groupId:e.group_id||null, groupName:e.group_name||"", visibilityScope:e.visibility_scope||"club", visibleGroupIds:Array.isArray(e.visible_group_ids)?e.visible_group_ids:[], maxAttendees:e.max_attendees||null, seatsUsed:e.seats_used||0, fillRatio:e.fill_ratio||0, isFull:!!e.is_full } };
+          return { id:e.id, title:e.group_name?e.title+" ["+e.group_name+"]":e.title, start:e.start_time, end:e.end_time, allDay:false, backgroundColor:bg, borderColor:bdr, textColor:"#141414", extendedProps:{ backendEventId:e.id, location:e.location||"", groupId:e.group_id||null, groupName:e.group_name||"", visibilityScope:e.visibility_scope||"club", visibleGroupIds:Array.isArray(e.visible_group_ids)?e.visible_group_ids:[], maxAttendees:e.max_attendees||null, seatsUsed:e.seats_used||0, fillRatio:e.fill_ratio||0, isFull:!!e.is_full } };
         });
       } catch(_) { return []; }
     }

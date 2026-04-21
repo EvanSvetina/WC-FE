@@ -4,7 +4,7 @@ title: About
 permalink: /navigation/about/
 ---
 
-<div class="pwc-section" style="max-width:820px; margin:0 auto; padding:2rem 1.5rem 1rem;">
+<div class="pwc-section" style="max-width:var(--pwc-content-max); margin:0 auto; padding-top:var(--pwc-section-pad-y);">
 
 <h2>About the Poway Woman's Club</h2>
 
@@ -36,13 +36,27 @@ We are proud members of the Friends of the Poway Library, Poway Historical and M
 <strong>Location:</strong> Templars Hall, Old Poway Park<br>
 <strong>Mail:</strong> P.O. Box 1356, Poway, CA 92074-1356
 
+<p style="margin-top:1.25rem; font-size:0.95rem; color:var(--pwc-muted);">Looking for a light community game? Scroll down to the <strong>Community Garden</strong> — a small interactive nod to our history that we keep on this About page so visitors can discover it while they learn who we are.</p>
+
 </div>
 
 <div id="garden-app">
 
   <div class="garden-header">
     <h2>Community Garden</h2>
-    <p class="garden-subtitle">Grow flowers, discover club history</p>
+    <p class="garden-subtitle">A simple click-and-grow game — learn club history as you play</p>
+  </div>
+
+  <div class="garden-instructions">
+    <h3>How to play</h3>
+    <ul>
+      <li><strong>Gather seeds</strong> — Click the flower. The more blooms you have earned in total, the more seeds each click adds.</li>
+      <li><strong>Plant</strong> — Costs 5 seeds and starts a new sprout in your plot (up to 30 plants).</li>
+      <li><strong>Water all</strong> — Every plant that is not fully bloomed grows one stage. You can also click a single plot to water just that plant.</li>
+      <li><strong>Bloom &amp; harvest</strong> — After enough watering steps a plant blooms; use Harvest to clear finished blooms and gain bonus seeds.</li>
+      <li><strong>Facts</strong> — Total blooms unlock short lines of Poway Woman's Club history in the grid below.</li>
+    </ul>
+    <p class="garden-subtitle" style="margin:0.65rem 0 0;">Signed-in members: your garden syncs to your account when the server accepts it; otherwise progress stays in this browser.</p>
   </div>
 
   <div class="garden-layout">
@@ -112,58 +126,13 @@ We are proud members of the Friends of the Poway Library, Poway Historical and M
 
 </div>
 
-<style>
-#garden-app {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem 3rem;
-  font-family: 'Nunito Sans', sans-serif;
-  color: var(--pwc-text);
-}
-.garden-header { text-align: center; margin-bottom: 2rem; }
-.garden-header h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: var(--pwc-charcoal); margin: 0 0 0.25rem; }
-.garden-subtitle { color: var(--pwc-muted); font-size: 0.95rem; margin: 0; }
-.garden-layout { display: grid; grid-template-columns: 240px 1fr; gap: 2rem; align-items: start; margin-bottom: 2.5rem; }
-@media (max-width: 680px) { .garden-layout { grid-template-columns: 1fr; } }
-.garden-sidebar { display: flex; flex-direction: column; gap: 1.25rem; }
-.garden-stats { display: flex; justify-content: space-between; background: var(--pwc-white); border: 1px solid var(--pwc-border); border-radius: 8px; padding: 0.75rem 1rem; }
-.garden-stat { text-align: center; }
-.garden-stat-val { display: block; font-size: 1.3rem; font-weight: 700; color: var(--pwc-charcoal); line-height: 1.2; }
-.garden-stat-lbl { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--pwc-muted); }
-.garden-clicker-area { display: flex; flex-direction: column; align-items: center; position: relative; }
-.garden-clicker { width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--pwc-border); background: var(--pwc-white); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.1s, border-color 0.2s; box-shadow: var(--pwc-shadow-md); }
-.garden-clicker:hover { border-color: var(--pwc-sage); }
-.garden-clicker:active { transform: scale(0.93); }
-.garden-clicker:active .garden-clicker-flower { transform: rotate(-8deg); }
-.garden-clicker-flower { transition: transform 0.12s; }
-.garden-clicker-hint { margin-top: 0.4rem; font-size: 0.78rem; color: var(--pwc-muted); }
-.garden-ripples { position: absolute; inset: 0; pointer-events: none; }
-.garden-seed-pop { position: absolute; font-size: 0.9rem; font-weight: 700; color: var(--pwc-sage-dark); pointer-events: none; animation: seed-pop 0.7s ease-out forwards; }
-@keyframes seed-pop { 0% { opacity: 1; transform: translate(0,0); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)); } }
-.garden-controls { display: flex; flex-direction: column; gap: 0.5rem; }
-.garden-ctrl { display: flex; align-items: center; justify-content: space-between; padding: 0.55rem 0.9rem; border: 1px solid var(--pwc-border); border-radius: 6px; background: var(--pwc-white); font-size: 0.88rem; font-weight: 600; font-family: inherit; color: var(--pwc-text); cursor: pointer; transition: background 0.15s, border-color 0.15s; }
-.garden-ctrl:hover:not(:disabled) { background: var(--pwc-sage-light); border-color: var(--pwc-sage); }
-.garden-ctrl:active:not(:disabled) { transform: scale(0.98); }
-.garden-ctrl:disabled { opacity: 0.4; cursor: default; }
-.garden-ctrl-cost { font-weight: 400; font-size: 0.78rem; color: var(--pwc-muted); }
-.garden-main { min-height: 200px; }
-.garden-plot { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; }
-.garden-empty-msg { grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: var(--pwc-muted); font-size: 0.9rem; }
-.garden-cell { aspect-ratio: 1; background: var(--pwc-white); border: 1px solid var(--pwc-border); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s, border-color 0.15s, background 0.2s; position: relative; }
-.garden-cell:hover { transform: scale(1.06); border-color: var(--pwc-sage); }
-.garden-cell.bloomed { background: var(--pwc-rose-light); border-color: var(--pwc-rose); }
-.garden-cell svg { width: 44px; height: 44px; }
-.garden-stage-up { position: absolute; font-size: 0.65rem; font-weight: 700; color: var(--pwc-sage-dark); top: 2px; right: 5px; animation: float-up 0.6s ease-out forwards; pointer-events: none; }
-@keyframes float-up { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-14px); } }
-.garden-toast { position: fixed; top: 1rem; left: 50%; transform: translateX(-50%) translateY(-16px); background: var(--pwc-sage-dark); color: #fff; padding: 0.6rem 1.2rem; border-radius: 6px; font-size: 0.88rem; font-weight: 600; box-shadow: var(--pwc-shadow-lg); z-index: 9999; opacity: 0; transition: opacity 0.25s, transform 0.25s; max-width: 600px; text-align: center; }
-.garden-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
-.garden-facts h2 { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: var(--pwc-charcoal); margin: 0 0 1rem; }
-.garden-facts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.75rem; }
-.garden-fact-card { background: var(--pwc-white); border: 1px solid var(--pwc-border); border-left: 3px solid var(--pwc-sage); border-radius: 6px; padding: 0.7rem 0.85rem; font-size: 0.84rem; color: var(--pwc-text); line-height: 1.5; }
-.garden-fact-card.locked { opacity: 0.35; border-left-color: var(--pwc-border); }
-.garden-fact-card.locked .fact-text { filter: blur(3px); }
-.fact-milestone { display: block; font-size: 0.72rem; color: var(--pwc-muted); margin-top: 0.25rem; }
-</style>
+<script>
+var API = (location.hostname === "localhost" || location.hostname === "127.0.0.1")
+  ? "{{ site.events_api_local_url | default: 'http://localhost:8327' | escape }}"
+  : "{{ site.events_api_base_url | escape }}";
+window.PWC_API_BASE_URL = API;
+</script>
+<script src="{{ '/assets/js/garden-sync.js' | relative_url }}"></script>
 
 <script>
 (function () {
@@ -203,10 +172,96 @@ We are proud members of the Friends of the Poway Library, Poway Historical and M
   var plantBtn = document.getElementById("plantBtn"), waterBtn = document.getElementById("waterBtn");
   var harvestBtn = document.getElementById("harvestBtn"), rippleCont = document.getElementById("rippleContainer");
   factTotalEl.textContent = FACTS.length;
+
   var SAVE_KEY = "pwc_garden";
-  function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify({ s: seeds, b: totalBlooms, f: unlockedFacts, p: plots })); } catch (_) {} }
-  function load() { try { var d = JSON.parse(localStorage.getItem(SAVE_KEY)); if (!d) return; seeds = d.s || 0; totalBlooms = d.b || 0; unlockedFacts = d.f || []; plots = d.p || []; } catch (_) {} }
-  function updateHUD() { seedEl.textContent = seeds; flowerEl.textContent = totalBlooms; factCountEl.textContent = unlockedFacts.length; plantBtn.disabled = seeds < 5 || plots.length >= maxPlots; waterBtn.disabled = plots.length === 0; harvestBtn.disabled = !plots.some(function (p) { return p.stage >= MAX_STAGE; }); }
+
+  function normalizeState(d) {
+    if (!d || typeof d !== "object") return { s: 0, b: 0, f: [], p: [], savedAt: 0 };
+    return {
+      s: d.s || 0,
+      b: d.b || 0,
+      f: Array.isArray(d.f) ? d.f : [],
+      p: Array.isArray(d.p) ? d.p : [],
+      savedAt: typeof d.savedAt === "number" ? d.savedAt : 0,
+    };
+  }
+
+  function applyState(st) {
+    seeds = st.s;
+    totalBlooms = st.b;
+    unlockedFacts = st.f.slice();
+    plots = st.p.slice();
+  }
+
+  function save() {
+    var payload = normalizeState({
+      s: seeds,
+      b: totalBlooms,
+      f: unlockedFacts,
+      p: plots,
+      savedAt: Date.now(),
+    });
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+    } catch (_) {}
+    if (typeof GardenSync !== "undefined") {
+      GardenSync.debouncedSave(payload);
+    }
+  }
+
+  function loadLocal() {
+    try {
+      var d = JSON.parse(localStorage.getItem(SAVE_KEY));
+      return normalizeState(d);
+    } catch (_) {
+      return normalizeState(null);
+    }
+  }
+
+  function boot() {
+    var local = loadLocal();
+    applyState(local);
+    renderPlots();
+    renderFacts();
+    updateHUD();
+
+    if (typeof GardenSync === "undefined") return;
+
+    GardenSync.loadServerState()
+      .then(function (srv) {
+        if (!srv) return;
+        var sn = normalizeState(srv);
+        var ln = loadLocal();
+        function score(st) {
+          if (st.savedAt) return st.savedAt;
+          return st.b * 1e6 + st.s + (st.p ? st.p.length : 0) * 100;
+        }
+        var serverEmpty = !sn.p.length && !sn.s && !sn.b && (!sn.f || !sn.f.length);
+        if (serverEmpty) return;
+        if (score(sn) > score(ln)) {
+          applyState(sn);
+          try {
+            localStorage.setItem(SAVE_KEY, JSON.stringify(sn));
+          } catch (_) {}
+          renderPlots();
+          renderFacts();
+          updateHUD();
+        }
+      })
+      .catch(function () {});
+  }
+
+  function updateHUD() {
+    seedEl.textContent = seeds;
+    flowerEl.textContent = totalBlooms;
+    factCountEl.textContent = unlockedFacts.length;
+    plantBtn.disabled = seeds < 5 || plots.length >= maxPlots;
+    waterBtn.disabled = plots.length === 0;
+    harvestBtn.disabled = !plots.some(function (p) {
+      return p.stage >= MAX_STAGE;
+    });
+  }
+
   function renderPlots() {
     var cells = plotEl.querySelectorAll(".garden-cell");
     for (var c = 0; c < cells.length; c++) cells[c].remove();
@@ -216,50 +271,125 @@ We are proud members of the Friends of the Poway Library, Poway Historical and M
       var bloomed = p.stage >= MAX_STAGE;
       cell.className = "garden-cell" + (bloomed ? " bloomed" : "");
       cell.innerHTML = plantSVG(p.stage, bloomed);
-      cell.addEventListener("click", function () { waterOne(i); });
+      cell.addEventListener("click", function () {
+        waterOne(i);
+      });
       plotEl.appendChild(cell);
     });
   }
+
   function renderFacts() {
     factsGrid.innerHTML = "";
     FACTS.forEach(function (text, i) {
       var card = document.createElement("div");
       var unlocked = unlockedFacts.indexOf(i) !== -1;
       card.className = "garden-fact-card" + (unlocked ? "" : " locked");
-      var inner = '<span class="fact-text">' + text + '</span>';
-      if (!unlocked) inner += '<span class="fact-milestone">Bloom ' + MILESTONES[i] + ' flowers to unlock</span>';
+      var inner = '<span class="fact-text">' + text + "</span>";
+      if (!unlocked) inner += '<span class="fact-milestone">Bloom ' + MILESTONES[i] + " flowers to unlock</span>";
       card.innerHTML = inner;
       factsGrid.appendChild(card);
     });
   }
+
   function showToast(text) {
-    toastText.textContent = text; toast.hidden = false; toast.offsetWidth;
+    toastText.textContent = text;
+    toast.hidden = false;
+    toast.offsetWidth;
     toast.classList.add("visible");
-    setTimeout(function () { toast.classList.remove("visible"); setTimeout(function () { toast.hidden = true; }, 300); }, 3000);
+    setTimeout(function () {
+      toast.classList.remove("visible");
+      setTimeout(function () {
+        toast.hidden = true;
+      }, 300);
+    }, 3000);
   }
+
   function checkMilestones() {
     for (var i = 0; i < MILESTONES.length && i < FACTS.length; i++) {
       if (totalBlooms >= MILESTONES[i] && unlockedFacts.indexOf(i) === -1) {
-        unlockedFacts.push(i); showToast("New fact unlocked: " + FACTS[i]); renderFacts();
+        unlockedFacts.push(i);
+        showToast("New fact unlocked: " + FACTS[i]);
+        renderFacts();
       }
     }
   }
+
   clickerBtn.addEventListener("click", function () {
-    var gain = 1 + Math.floor(totalBlooms / 10); seeds += gain;
-    var pop = document.createElement("span"); pop.className = "garden-seed-pop"; pop.textContent = "+" + gain;
-    var angle = Math.random() * Math.PI * 2, dist = 25 + Math.random() * 25;
-    pop.style.setProperty("--dx", Math.cos(angle) * dist + "px"); pop.style.setProperty("--dy", Math.sin(angle) * dist - 15 + "px");
-    pop.style.left = "50%"; pop.style.top = "40%"; rippleCont.appendChild(pop);
-    setTimeout(function () { pop.remove(); }, 750); updateHUD(); save();
+    var gain = 1 + Math.floor(totalBlooms / 10);
+    seeds += gain;
+    var pop = document.createElement("span");
+    pop.className = "garden-seed-pop";
+    pop.textContent = "+" + gain;
+    var angle = Math.random() * Math.PI * 2,
+      dist = 25 + Math.random() * 25;
+    pop.style.setProperty("--dx", Math.cos(angle) * dist + "px");
+    pop.style.setProperty("--dy", Math.sin(angle) * dist - 15 + "px");
+    pop.style.left = "50%";
+    pop.style.top = "40%";
+    rippleCont.appendChild(pop);
+    setTimeout(function () {
+      pop.remove();
+    }, 750);
+    updateHUD();
+    save();
   });
-  plantBtn.addEventListener("click", function () { if (seeds < 5 || plots.length >= maxPlots) return; seeds -= 5; plots.push({ stage: 1 }); renderPlots(); updateHUD(); save(); });
+
+  plantBtn.addEventListener("click", function () {
+    if (seeds < 5 || plots.length >= maxPlots) return;
+    seeds -= 5;
+    plots.push({ stage: 1 });
+    renderPlots();
+    updateHUD();
+    save();
+  });
+
   waterBtn.addEventListener("click", function () {
     var grew = false;
-    plots.forEach(function (p) { if (p.stage > 0 && p.stage < MAX_STAGE) { p.stage++; grew = true; if (p.stage >= MAX_STAGE) { totalBlooms++; checkMilestones(); } } });
-    if (grew) { renderPlots(); updateHUD(); save(); }
+    plots.forEach(function (p) {
+      if (p.stage > 0 && p.stage < MAX_STAGE) {
+        p.stage++;
+        grew = true;
+        if (p.stage >= MAX_STAGE) {
+          totalBlooms++;
+          checkMilestones();
+        }
+      }
+    });
+    if (grew) {
+      renderPlots();
+      updateHUD();
+      save();
+    }
   });
-  function waterOne(idx) { var p = plots[idx]; if (!p || p.stage <= 0 || p.stage >= MAX_STAGE) return; p.stage++; if (p.stage >= MAX_STAGE) { totalBlooms++; checkMilestones(); } renderPlots(); updateHUD(); save(); }
-  harvestBtn.addEventListener("click", function () { var n = 0; plots = plots.filter(function (p) { if (p.stage >= MAX_STAGE) { n++; return false; } return true; }); seeds += n * 3; renderPlots(); updateHUD(); save(); });
-  load(); renderPlots(); renderFacts(); updateHUD();
+
+  function waterOne(idx) {
+    var p = plots[idx];
+    if (!p || p.stage <= 0 || p.stage >= MAX_STAGE) return;
+    p.stage++;
+    if (p.stage >= MAX_STAGE) {
+      totalBlooms++;
+      checkMilestones();
+    }
+    renderPlots();
+    updateHUD();
+    save();
+  }
+
+  harvestBtn.addEventListener("click", function () {
+    var n = 0;
+    plots = plots.filter(function (p) {
+      if (p.stage >= MAX_STAGE) {
+        n++;
+        return false;
+      }
+      return true;
+    });
+    seeds += n * 3;
+    renderPlots();
+    updateHUD();
+    save();
+  });
+
+  boot();
 })();
 </script>

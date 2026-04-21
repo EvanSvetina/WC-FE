@@ -48,6 +48,18 @@ var Blog = (function () {
 
     bindEvents();
     loadPosts();
+
+    /* Deep link: /navigation/blog?post=123 */
+    var qp = new URLSearchParams(window.location.search);
+    var deepId = qp.get("post");
+    if (deepId) {
+      var pid = parseInt(deepId, 10);
+      if (!isNaN(pid) && pid > 0) {
+        setTimeout(function () {
+          openPost(pid);
+        }, 450);
+      }
+    }
   }
 
   /* ── Event binding ───────────────────────────────────────────────────── */

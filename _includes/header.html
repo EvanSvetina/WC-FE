@@ -23,15 +23,20 @@
             <a class="page-link" href="{{ my_page.url | relative_url }}">{{ my_page.title | escape }}</a>
             {%- endif -%}
           {%- endfor -%}
-          <a class="page-link" id="pwc-auth-link" href="{{ "/navigation/settings" | relative_url }}">Settings</a>
+          <a class="page-link pwc-page-link--cta" id="pwc-login-nav" href="{{ "/navigation/login" | relative_url }}">Log in</a>
+          <a class="page-link pwc-page-link--cta" id="pwc-settings-nav" href="{{ "/navigation/settings" | relative_url }}" hidden>Settings</a>
           <script>
           (function(){
             var u = null;
             try { u = JSON.parse(sessionStorage.getItem('pwc_user')); } catch(_){}
+            var loginNav = document.getElementById('pwc-login-nav');
+            var settingsNav = document.getElementById('pwc-settings-nav');
             if (u) {
-              var a = document.getElementById('pwc-auth-link');
-              a.href = '{{ "/navigation/social" | relative_url }}';
-              a.textContent = u.firstName || u.username || 'Social';
+              if (loginNav) loginNav.setAttribute('hidden', '');
+              if (settingsNav) settingsNav.removeAttribute('hidden');
+            } else {
+              if (loginNav) loginNav.removeAttribute('hidden');
+              if (settingsNav) settingsNav.setAttribute('hidden', '');
             }
           })();
           </script>

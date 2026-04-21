@@ -7,6 +7,10 @@
 
   var API_BASE = (global.PWC_API_BASE_URL || 'http://localhost:8327').replace(/\/$/, '');
 
+  function isLocalDevApi(url) {
+    return /localhost|127\.0\.0\.1/.test(String(url || ""));
+  }
+
   function loadScript(src) {
     return new Promise(function (resolve, reject) {
       var s = document.createElement('script');
@@ -103,9 +107,13 @@
         });
       })
       .catch(function (err) {
-        var msg = 'Could not reach the API for Google sign-in settings. Check events_api_base_url in _config.yml matches your Flask URL (e.g. http://localhost:8327) and that the browser origin is allowed by Flask CORS.';
+        var msg = isLocalDevApi(API_BASE)
+          ? "Google sign-in needs the Flask API at " + API_BASE + " (nothing responded — start the backend; the site preview port is only for HTML)."
+          : "Could not load Google sign-in settings from the API. Check events_api_base_url in _config.yml and Flask CORS for this site.";
         if (global.PWC_GOOGLE_ERROR) global.PWC_GOOGLE_ERROR({ message: msg });
-        try { console.warn('google-config fetch failed', err); } catch (e) { /* no-op */ }
+        try {
+          console.warn("google-config fetch failed:", err || "(network error)");
+        } catch (e) { /* no-op */ }
       });
   }
 

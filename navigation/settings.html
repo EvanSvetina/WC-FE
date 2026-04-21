@@ -6,96 +6,22 @@ permalink: /navigation/settings/
 show_reading_time: false
 ---
 
-<!-- ══════════════════════════════════════════════════════════
-     LOGGED-OUT: Login / Register
-     ══════════════════════════════════════════════════════════ -->
-<div id="pwc-settings-login" class="pwc-login-page">
-  <div class="login-card">
-    <div class="login-brand">
-      <div class="login-emblem">PWC</div>
-      <h1 id="formTitle">Member Login</h1>
-      <p id="formSubtitle">Poway Woman's Club — Members Area</p>
-    </div>
-    <hr class="login-divider">
-    <div class="login-alert" id="loginAlert" role="alert"></div>
-    <div class="login-alert login-alert--success" id="successAlert" role="status"></div>
+<script>
+(function () {
+  var ok = false;
+  try {
+    var u = JSON.parse(sessionStorage.getItem("pwc_user") || "null");
+    ok = !!(u && (u.id || u.username));
+  } catch (e) {}
+  if (!ok) {
+    var next = window.location.pathname + window.location.search;
+    window.location.replace("{{ site.baseurl }}/navigation/login?next=" + encodeURIComponent(next));
+  }
+})();
+</script>
 
-    <!-- SIGN IN -->
-    <div id="loginForm">
-      <div class="login-fields">
-        <div class="login-field">
-          <label for="username">Username</label>
-          <input class="form__input" type="text" id="username" placeholder="your.username" autocomplete="username" autocapitalize="none" spellcheck="false">
-        </div>
-        <div class="login-field">
-          <label for="password">Password</label>
-          <div class="login-pw-wrap">
-            <input class="form__input" type="password" id="password" placeholder="••••••••" autocomplete="current-password">
-            <button class="login-pw-toggle" id="pwToggle" type="button" aria-label="Show password">Show</button>
-          </div>
-        </div>
-      </div>
-      <div class="login-actions">
-        <button class="btn btn__primary" id="loginBtn" type="button">Sign In</button>
-        <a class="btn btn__secondary" href="{{ site.baseurl }}/">← Back to Home</a>
-      </div>
-      <div class="login-google-wrap" id="googleSignInWrap" hidden>
-        <p class="login-oauth-label">or</p>
-        <button class="btn btn__secondary login-google-btn" id="googleSignInBtn" type="button">Continue with Google</button>
-      </div>
-      <div class="login-back">Don't have an account? <a href="#" id="showRegister">Create one</a></div>
-    </div>
-
-    <!-- REGISTER -->
-    <div id="registerForm" style="display:none;">
-      <div class="login-fields">
-        <div class="login-field login-field--row">
-          <div class="login-field">
-            <label for="regFirstName">First Name</label>
-            <input class="form__input" type="text" id="regFirstName" placeholder="Jane" autocomplete="given-name">
-          </div>
-          <div class="login-field">
-            <label for="regLastName">Last Name</label>
-            <input class="form__input" type="text" id="regLastName" placeholder="Doe" autocomplete="family-name">
-          </div>
-        </div>
-        <div class="login-field">
-          <label for="regUsername">Username</label>
-          <input class="form__input" type="text" id="regUsername" placeholder="jane.doe" autocomplete="username" autocapitalize="none" spellcheck="false">
-        </div>
-        <div class="login-field">
-          <label for="regEmail">Email</label>
-          <input class="form__input" type="email" id="regEmail" placeholder="jane@example.com" autocomplete="email">
-        </div>
-        <div class="login-field">
-          <label for="regPassword">Password</label>
-          <div class="login-pw-wrap">
-            <input class="form__input" type="password" id="regPassword" placeholder="••••••••" autocomplete="new-password">
-            <button class="login-pw-toggle" id="regPwToggle" type="button" aria-label="Show password">Show</button>
-          </div>
-        </div>
-        <div class="login-field">
-          <label for="regConfirm">Confirm Password</label>
-          <input class="form__input" type="password" id="regConfirm" placeholder="••••••••" autocomplete="new-password">
-        </div>
-      </div>
-      <div class="login-actions">
-        <button class="btn btn__primary" id="registerBtn" type="button">Create Account</button>
-        <a class="btn btn__secondary" href="{{ site.baseurl }}/">← Back to Home</a>
-      </div>
-      <div class="login-google-wrap" id="googleSignInWrapRegister" hidden>
-        <p class="login-oauth-label">or</p>
-        <button class="btn btn__secondary login-google-btn" id="googleSignInBtnRegister" type="button">Continue with Google</button>
-      </div>
-      <div class="login-back">Already have an account? <a href="#" id="showLogin">Sign in</a></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════════════════
-     LOGGED-IN: Account Settings
-     ══════════════════════════════════════════════════════════ -->
-<div id="pwc-settings-app" style="display:none;">
+<!-- Logged-in members only (visitors are redirected to Log in) -->
+<div id="pwc-settings-app">
   <div class="pwc-profile-wrap">
 
     <!-- Sidebar -->
@@ -255,25 +181,18 @@ show_reading_time: false
     : "{{ site.events_api_base_url | escape }}";
   window.API = window.PWC_API_BASE_URL;
 </script>
-<script src="{{ site.baseurl }}/assets/js/google-oauth.js"></script>
-<script src="{{ site.baseurl }}/assets/js/profile-api.js"></script>
-<script src="{{ site.baseurl }}/assets/js/cropper.min.js"></script>
-<script src="{{ site.baseurl }}/assets/js/profile-avatar.js"></script>
-<script src="{{ site.baseurl }}/assets/js/login.js"></script>
+<script src="{{ '/assets/js/google-oauth.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/profile-api.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/cropper.min.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/profile-avatar.js' | relative_url }}"></script>
 <script>
-/* ── Settings page: runs when logged in ──────────────────────────────── */
+/* ── Settings page (user must be logged in; others redirected at top) ─ */
 (function () {
   "use strict";
 
   var user = null;
   try { user = JSON.parse(sessionStorage.getItem("pwc_user")); } catch (_) {}
-  if (!user) return; /* login.js handles the logged-out UI */
-
-  /* ── Show settings, hide login ── */
-  var loginEl = document.getElementById("pwc-settings-login");
-  var appEl   = document.getElementById("pwc-settings-app");
-  if (loginEl) loginEl.style.display = "none";
-  if (appEl)   appEl.style.display   = "";
+  if (!user) return;
 
   /* ── Helpers ── */
   function el(id) { return document.getElementById(id); }
@@ -402,7 +321,7 @@ show_reading_time: false
       if (nw.value !== conf.value) { showMsg(el("pwMsg"), "Passwords don't match.", true); return; }
       if (nw.value.length < 6) { showMsg(el("pwMsg"), "New password must be at least 6 characters.", true); return; }
       pwBtn.disabled = true; pwBtn.textContent = "Updating…";
-      ProfileAPI.changePassword(cur.value, nw.value)
+      ProfileAPI.changePassword(cur.value, nw.value, conf.value)
         .then(function () {
           cur.value = ""; nw.value = ""; conf.value = "";
           showMsg(el("pwMsg"), "Password updated.", false);
@@ -495,7 +414,7 @@ show_reading_time: false
     logoutBtn.addEventListener("click", function () {
       sessionStorage.removeItem("pwc_user");
       ProfileAPI.logout().finally(function () {
-        window.location.href = "{{ site.baseurl }}/navigation/settings";
+        window.location.href = "{{ site.baseurl }}/navigation/login";
       });
     });
   }

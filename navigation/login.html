@@ -1,7 +1,8 @@
 ---
 layout: default
-title: Member Login
+title: Log in
 hide: true
+permalink: /navigation/login/
 show_reading_time: false
 ---
 
@@ -86,7 +87,7 @@ show_reading_time: false
         <div class="login-field">
           <label for="regConfirm">Confirm Password</label>
           <input class="form__input" type="password" id="regConfirm" placeholder="••••••••"
-                 autocomplete="new-password">
+                   autocomplete="new-password">
         </div>
       </div>
       <div class="login-actions">
@@ -109,6 +110,7 @@ show_reading_time: false
   window.PWC_API_BASE_URL = (location.hostname === "localhost" || location.hostname === "127.0.0.1")
     ? "{{ site.events_api_local_url | default: 'http://localhost:8327' | escape }}"
     : "{{ site.events_api_base_url | escape }}";
+  window.API = window.PWC_API_BASE_URL;
 </script>
-<script src="{{ site.baseurl }}/assets/js/google-oauth.js"></script>
-<script src="{{ site.baseurl }}/assets/js/login.js"></script>
+<script src="{{ '/assets/js/google-oauth.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/login.js' | relative_url }}"></script>

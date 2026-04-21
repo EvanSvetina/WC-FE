@@ -1,25 +1,20 @@
 ---
-layout: page
+layout: default
 title: Contact
 permalink: /navigation/contact/
+hide: true
+show_reading_time: false
 ---
 
-## Get in Touch
+<div class="pwc-section" style="max-width:var(--pwc-content-max); margin:0 auto;">
+  <h2>Contact has moved</h2>
+  <hr class="pwc-rule">
+  <p>Mailing address, meetings, and member messaging are now on the <a href="{{ site.baseurl }}/#contact">home page (Contact section)</a>.</p>
+  <p><a href="{{ site.baseurl }}/#contact" class="pwc-btn pwc-btn-fill">Go to home — Contact</a></p>
+</div>
 
-*A working contact form is coming soon to replace the old broken email link.*
-
-### Mailing Address
-
-Poway Woman's Club  
-P.O. Box 1356  
-Poway, CA 92074-1356
-
-### Meetings
-
-Join us at our next General Meeting — held on the **2nd Tuesday of every month**, September through June, at **10:00 AM** in **Templars Hall, Old Poway Park**.
-
-New members and visitors are always welcome.
-
-### Interested in Joining?
-
-Membership information and online payment will be available here soon. In the meantime, come visit us at a meeting — no RSVP needed.
+<script>
+  if (window.location.hash !== "#contact") {
+    window.location.replace("{{ site.baseurl }}/#contact");
+  }
+</script>

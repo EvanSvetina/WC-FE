@@ -17,13 +17,36 @@
 
   /* ── Config ─────────────────────────────────────────────────── */
 
-  var BASE = '/pwc';
+  function siteBasePath() {
+    var b = typeof window.PWC_BASE === 'string' ? window.PWC_BASE : '';
+    return b.replace(/\/$/, '');
+  }
+
+  function defaultAfterLoginPath() {
+    var base = siteBasePath();
+    return (base ? base : '') + '/navigation/social';
+  }
+
+  function redirectAfterLoginUrl() {
+    try {
+      var q = new URLSearchParams(window.location.search).get('next');
+      if (q && q.charAt(0) === '/' && q.indexOf('//') === -1) {
+        return q;
+      }
+    } catch (e) { /* noop */ }
+    return defaultAfterLoginPath();
+  }
+
   var API_BASE_URL = (window.PWC_API_BASE_URL || 'http://localhost:8327').replace(/\/$/, '');
-  var REDIRECT_AFTER_LOGIN = BASE + '/navigation/social';
 
   /* ── Helpers ─────────────────────────────────────────────────── */
 
   function el(id) { return document.getElementById(id); }
+
+  /* Only the dedicated login page includes #loginBtn — skip when this script is bundled elsewhere */
+  if (!el('loginBtn')) {
+    return;
+  }
 
   function isNetworkFailure(err) {
     if (!err) return false;
@@ -34,7 +57,17 @@
   }
 
   function networkHelpMessage() {
-    return "We're having trouble connecting. Please try again in a moment.";
+    var api = API_BASE_URL || '';
+    /* Local dev: Jekyll/GH Pages preview (e.g. :4600) does not serve /api — Flask must run separately */
+    if (/localhost|127\.0\.0\.1/.test(api)) {
+      return (
+        "Cannot reach the member API at " +
+        api +
+        ". Start your Flask backend on that URL (port 8327 in the default setup), or change events_api_local_url in _config.yml. " +
+        "The site preview and the API are two different servers."
+      );
+    }
+    return "We're having trouble connecting. Check that events_api_base_url in _config.yml matches your live API.";
   }
 
   function showApiError(err) {
@@ -43,31 +76,45 @@
 
   function showAlert(msg) {
     var a = el('loginAlert');
-    a.textContent = msg;
-    a.classList.add('visible');
+    if (a) {
+      a.textContent = msg;
+      a.classList.add('visible');
+    }
     var s = el('successAlert');
-    s.textContent = '';
-    s.classList.remove('visible');
+    if (s) {
+      s.textContent = '';
+      s.classList.remove('visible');
+    }
   }
 
   function showSuccess(msg) {
     var s = el('successAlert');
-    s.textContent = msg;
-    s.classList.add('visible');
+    if (s) {
+      s.textContent = msg;
+      s.classList.add('visible');
+    }
     var a = el('loginAlert');
-    a.textContent = '';
-    a.classList.remove('visible');
+    if (a) {
+      a.textContent = '';
+      a.classList.remove('visible');
+    }
   }
 
   function hideAlerts() {
-    el('loginAlert').textContent = '';
-    el('loginAlert').classList.remove('visible');
-    el('successAlert').textContent = '';
-    el('successAlert').classList.remove('visible');
+    var a = el('loginAlert'), s = el('successAlert');
+    if (a) {
+      a.textContent = '';
+      a.classList.remove('visible');
+    }
+    if (s) {
+      s.textContent = '';
+      s.classList.remove('visible');
+    }
   }
 
   function setLoading(btnId, on, label) {
     var btn = el(btnId);
+    if (!btn) return;
     btn.disabled = on;
     btn.textContent = on ? label + '…' : label;
   }
@@ -75,23 +122,27 @@
   /* ── Form toggling (Sign In ↔ Register) ────────────────────── */
 
   function showLoginForm() {
-    el('loginForm').style.display = '';
-    el('registerForm').style.display = 'none';
-    el('formTitle').textContent = 'Member Login';
-    el('formSubtitle').textContent = "Poway Woman's Club — Members Area";
+    var lf = el('loginForm'), rf = el('registerForm'), ft = el('formTitle'), fs = el('formSubtitle');
+    if (lf) lf.style.display = '';
+    if (rf) rf.style.display = 'none';
+    if (ft) ft.textContent = 'Member Login';
+    if (fs) fs.textContent = "Poway Woman's Club — Members Area";
     hideAlerts();
   }
 
   function showRegisterForm() {
-    el('loginForm').style.display = 'none';
-    el('registerForm').style.display = '';
-    el('formTitle').textContent = 'Create Account';
-    el('formSubtitle').textContent = 'Join the Poway Woman\'s Club';
+    var lf = el('loginForm'), rf = el('registerForm'), ft = el('formTitle'), fs = el('formSubtitle');
+    if (lf) lf.style.display = 'none';
+    if (rf) rf.style.display = '';
+    if (ft) ft.textContent = 'Create Account';
+    if (fs) fs.textContent = 'Join the Poway Woman\'s Club';
     hideAlerts();
   }
 
-  el('showRegister').addEventListener('click', function (e) { e.preventDefault(); showRegisterForm(); });
-  el('showLogin').addEventListener('click', function (e) { e.preventDefault(); showLoginForm(); });
+  var showRegEl = el('showRegister');
+  var showLoginEl = el('showLogin');
+  if (showRegEl) showRegEl.addEventListener('click', function (e) { e.preventDefault(); showRegisterForm(); });
+  if (showLoginEl) showLoginEl.addEventListener('click', function (e) { e.preventDefault(); showLoginForm(); });
 
   /* ── API helpers ────────────────────────────────────────────── */
 
@@ -130,7 +181,7 @@
       avatar_custom:   !!user.avatar_custom,
     };
     sessionStorage.setItem('pwc_user', JSON.stringify(session));
-    window.location.href = REDIRECT_AFTER_LOGIN;
+    window.location.href = redirectAfterLoginUrl();
   }
 
   /* ── Login ──────────────────────────────────────────────────── */
@@ -208,7 +259,10 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ firstName: firstName, lastName: lastName })
       }).then(function (res) {
-        return res.json();
+        return res.json().then(function (body) {
+          if (!res.ok) throw new Error((body && body.error) || 'Could not save your name.');
+          return body;
+        });
       }).then(function (updated) {
         storeAndRedirect(updated);
       });
@@ -267,12 +321,13 @@
     });
   }
 
-  /* ── Init ────────────────────────────────────────────────────── */
+  /* ── Init ──────────────────────────────────────────────────── */
 
-  // If already logged in, skip straight to profile
+  // If already logged in, go to member area (or ?next=)
   try {
     if (sessionStorage.getItem('pwc_user')) {
-      window.location.href = REDIRECT_AFTER_LOGIN;
+      window.location.replace(redirectAfterLoginUrl());
+      return;
     }
   } catch (_) {}
 
@@ -288,7 +343,8 @@
   }
 
   el('loginBtn').addEventListener('click', doLogin);
-  el('registerBtn').addEventListener('click', doRegister);
+  var registerBtn = el('registerBtn');
+  if (registerBtn) registerBtn.addEventListener('click', doRegister);
   bindPasswordToggle('pwToggle', 'password');
   bindPasswordToggle('regPwToggle', 'regPassword');
   bindInputStyling();

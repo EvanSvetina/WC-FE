@@ -105,9 +105,13 @@ var ProfileAPI = (function () {
     });
   }
 
+  /* Alias used by settings / social quick-edit forms */
+  var updateProfile = saveProfile;
+
   return {
     validateSession: validateSession,
     saveProfile:     saveProfile,
+    updateProfile:   updateProfile,
     changePassword:  changePassword,
     logout:          logout,
     linkGoogle:      linkGoogle,
