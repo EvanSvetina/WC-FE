@@ -1,7 +1,7 @@
 /* =============================================================================
    Poway Woman's Club — pwc.css
    Single consolidated stylesheet. Overrides Minima remote theme.
-   Palette: ivory / royal blue / crimson / gold — GFWC
+   Palette: cream / sage / rose / warm gold
    Fonts:  Playfair Display (headings) + Nunito Sans (body)
    ============================================================================= */
 
@@ -11,25 +11,25 @@
 
 :root {
   color-scheme: light;
-  --pwc-cream:      #f3f4f6;
-  --pwc-sage:       #1B3A9C;
-  --pwc-sage-dark:  #122877;
-  --pwc-sage-light: #dde4f6;
-  --pwc-rose:       #C41230;
-  --pwc-rose-dark:  #9B0E26;
-  --pwc-rose-light: #fce8ec;
-  --pwc-warm:       #C4921B;
-  --pwc-warm-dark:  #a87818;
-  --pwc-warm-light: #f6ecdc;
-  --pwc-charcoal:   #0f0f0f;
-  --pwc-navy:       #0c1942;
-  --pwc-text:       #1c1c1e;
-  --pwc-muted:      #6a6a72;
-  --pwc-border:     #e0ddd8;
+  --pwc-cream:      #f5f0ed;
+  --pwc-sage:       #7a8e6b;
+  --pwc-sage-dark:  #5c6e50;
+  --pwc-sage-light: #e4ecd9;
+  --pwc-rose:       #c4788a;
+  --pwc-rose-dark:  #a25d6e;
+  --pwc-rose-light: #f5e0e6;
+  --pwc-warm:       #c9a070;
+  --pwc-warm-dark:  #a07548;
+  --pwc-warm-light: #f0e4d4;
+  --pwc-charcoal:   #2e2729;
+  --pwc-navy:       #1e1618;
+  --pwc-text:       #3d3739;
+  --pwc-muted:      #7a7476;
+  --pwc-border:     #e4dce0;
   --pwc-white:      #ffffff;
-  --pwc-shadow-sm:  0 1px 3px rgba(17,17,17,0.07), 0 1px 2px rgba(17,17,17,0.05);
-  --pwc-shadow-md:  0 4px 12px rgba(17,17,17,0.10), 0 1px 4px rgba(17,17,17,0.06);
-  --pwc-shadow-lg:  0 8px 28px rgba(17,17,17,0.14), 0 2px 8px rgba(17,17,17,0.07);
+  --pwc-shadow-sm:  0 1px 3px rgba(52,46,48,0.06), 0 1px 2px rgba(52,46,48,0.04);
+  --pwc-shadow-md:  0 4px 12px rgba(52,46,48,0.08), 0 1px 4px rgba(52,46,48,0.04);
+  --pwc-shadow-lg:  0 8px 28px rgba(52,46,48,0.10), 0 2px 8px rgba(52,46,48,0.05);
 }
 
 /* ─── 1b. BASE RESET & LAYOUT (replaces Minima main.css) ─────────────────── */
@@ -41,7 +41,7 @@ body {
   font-size: 16px;
   line-height: 1.5;
   color: var(--pwc-text);
-  background-color: var(--pwc-white);
+  background-color: var(--pwc-cream);
   margin: 0;
   -webkit-text-size-adjust: 100%;
 }
@@ -59,11 +59,11 @@ body {
 
 /* Site header */
 .site-header {
-  border-bottom: 1px solid rgba(196,146,27,0.25);
+  border-bottom: 1px solid var(--pwc-border);
   min-height: 56px;
   position: relative;
-  background: var(--pwc-charcoal);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  background: var(--pwc-white);
+  box-shadow: var(--pwc-shadow-sm);
 }
 .site-header .wrapper {
   display: flex;
@@ -79,12 +79,12 @@ body {
   font-weight: 700;
   line-height: 56px;
   letter-spacing: 0.03em;
-  color: var(--pwc-warm);
+  color: var(--pwc-charcoal);
   text-decoration: none;
   white-space: nowrap;
 }
-.site-title:visited { color: var(--pwc-warm); }
-.site-title:hover   { text-decoration: none; color: #d9a520; }
+.site-title:visited { color: var(--pwc-charcoal); }
+.site-title:hover   { text-decoration: none; }
 
 /* Site nav */
 .site-nav {
@@ -98,7 +98,7 @@ body {
   font-family: 'Nunito Sans', sans-serif;
   font-weight: 600;
   font-size: 0.88rem;
-  color: rgba(255,255,255,0.70);
+  color: var(--pwc-muted);
   text-decoration: none;
   padding: 0.4rem 0.75rem;
   border-radius: 6px;
@@ -106,53 +106,47 @@ body {
   position: relative;
 }
 .site-nav .page-link:hover {
-  color: var(--pwc-white);
-  background: rgba(255,255,255,0.10);
+  color: var(--pwc-charcoal);
+  background: var(--pwc-sage-light);
 }
 .site-nav .page-link:last-child {
-  color: var(--pwc-charcoal);
-  background: var(--pwc-warm);
+  color: var(--pwc-rose-dark);
+  background: var(--pwc-rose-light);
   font-weight: 700;
 }
 .site-nav .page-link:last-child:hover {
-  background: #d9a520;
-  color: var(--pwc-charcoal);
+  background: var(--pwc-rose);
+  color: var(--pwc-white);
 }
 
 /* Mobile hamburger nav */
 @media screen and (max-width: 600px) {
   .site-nav {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    background-color: #1a1a1a;
-    border: none;
-    border-bottom: 1px solid rgba(196,146,27,0.25);
-    border-radius: 0;
+    top: 9px;
+    right: 15px;
+    background-color: var(--pwc-white);
+    border: 1px solid var(--pwc-border);
+    border-radius: 8px;
     text-align: right;
-    z-index: 200;
   }
   .site-nav label[for="nav-trigger"] {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    height: 56px;
-    padding: 0 15px;
+    display: block;
+    width: 36px;
+    height: 36px;
     cursor: pointer;
+    padding: 8px;
   }
   .site-nav .menu-icon { display: block; }
-  .site-nav .menu-icon > svg { fill: var(--pwc-warm); }
+  .site-nav .menu-icon > svg { fill: var(--pwc-charcoal); }
   .site-nav .trigger {
     display: none;
     padding: 0.5rem 0;
-    width: 100%;
   }
   .site-nav .trigger .page-link {
     display: block;
-    padding: 0.6rem 1.25rem;
+    padding: 0.5rem 1rem;
     margin: 0;
-    text-align: left;
   }
   .site-nav input:checked ~ .trigger { display: block; }
 }
@@ -164,16 +158,16 @@ body {
 
 /* Site footer */
 .site-footer {
-  border-top: 1px solid rgba(196,146,27,0.25);
+  border-top: 1px solid var(--pwc-border);
   padding: 30px 0;
-  background: var(--pwc-charcoal);
-  color: rgba(255,255,255,0.55);
-  box-shadow: 0 -2px 8px rgba(0,0,0,0.35);
+  background: var(--pwc-white);
+  color: var(--pwc-muted);
+  box-shadow: 0 -1px 3px rgba(52,46,48,0.04);
 }
 .footer-heading {
   font-family: 'Playfair Display', serif;
   font-size: 1.1rem;
-  color: var(--pwc-warm);
+  color: var(--pwc-charcoal);
   margin-bottom: 15px;
 }
 .footer-col-wrapper {
@@ -197,8 +191,8 @@ body {
 }
 .social-media-list li { display: inline-block; }
 .svg-icon { width: 16px; height: 16px; vertical-align: middle; fill: var(--pwc-muted); }
-.site-footer a { color: var(--pwc-warm); text-decoration: none; }
-.site-footer a:hover { color: rgba(255,255,255,0.9); }
+.site-footer a { color: var(--pwc-rose-dark); text-decoration: none; }
+.site-footer a:hover { color: var(--pwc-rose); }
 
 /* ─── 2. CUSTOM THEME ────────────────────────────────────────────────────── */
 
