@@ -633,6 +633,18 @@
     var footer = document.querySelector(".site-footer");
     if (footer) footer.style.display = "none";
 
+    /* ── Dynamic DM layout height (accounts for mobile topbar wrapping) ──── */
+
+    function updateDmHeight() {
+      var appTopbar   = document.querySelector(".pwc-topbar");
+      var siteHeader  = document.querySelector(".site-header");
+      var h = (appTopbar  ? appTopbar.offsetHeight  : 52)
+            + (siteHeader ? siteHeader.offsetHeight : 56);
+      document.documentElement.style.setProperty("--pwc-dm-offset", h + "px");
+    }
+    updateDmHeight();
+    window.addEventListener("resize", updateDmHeight);
+
     /* ── Initial render ──────────────────────────────────────────────────── */
 
     renderOverview();

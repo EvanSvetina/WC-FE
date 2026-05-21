@@ -211,6 +211,7 @@ var ProfileMessages = (function () {
 
     el("dmEmpty").style.display = "none";
     el("dmConvo").style.display = "flex";
+    openMobileChat();
 
     renderDmList(el("dmSearch") ? el("dmSearch").value : "");
 
@@ -321,11 +322,34 @@ var ProfileMessages = (function () {
       });
   }
 
+  /* ── Mobile chat-panel management ───────────────────────────────────── */
+
+  function getDmLayout() {
+    return document.querySelector(".pwc-dm-layout");
+  }
+
+  function openMobileChat() {
+    var layout = getDmLayout();
+    if (layout) layout.classList.add("chat-active");
+  }
+
+  function closeMobileChat() {
+    var layout = getDmLayout();
+    if (layout) layout.classList.remove("chat-active");
+    activeContact = null;
+    el("dmEmpty").style.display = "";
+    el("dmConvo").style.display = "none";
+    renderDmList(el("dmSearch") ? el("dmSearch").value : "");
+  }
+
   /* ── Event binding ───────────────────────────────────────────────────── */
 
   function bindEvents() {
     var sendBtn = el("dmSend");
     if (sendBtn) sendBtn.addEventListener("click", sendMessage);
+
+    var backBtn = el("dmBack");
+    if (backBtn) backBtn.addEventListener("click", closeMobileChat);
 
     var input = el("dmInput");
     if (input) {

@@ -178,7 +178,7 @@ var ProfileFriends = (function () {
       .then(function () {
         liEl.style.opacity = "0.4";
         liEl.style.pointerEvents = "none";
-        setTimeout(function () { liEl.remove(); }, 500);
+        setTimeout(function () { liEl.remove(); load(); }, 500);
       })
       .catch(function (err) { alert(err.message); });
   }
