@@ -357,10 +357,10 @@ code, pre {
   padding: 5rem 2rem 3.5rem;
   text-align: center;
   background:
-    radial-gradient(ellipse at 25% 60%, rgba(27,58,156,0.55) 0%, transparent 55%),
-    radial-gradient(ellipse at 75% 40%, rgba(196,18,48,0.30) 0%, transparent 50%),
-    linear-gradient(160deg, var(--pwc-charcoal) 0%, var(--pwc-navy) 55%, #0a1430 100%);
-  border-bottom: 2px solid var(--pwc-warm);
+    radial-gradient(ellipse at 20% 50%, rgba(221,230,213,0.5) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 50%, rgba(245,224,230,0.5) 0%, transparent 50%),
+    linear-gradient(135deg, var(--pwc-sage-light) 0%, var(--pwc-cream) 40%, var(--pwc-rose-light) 100%);
+  border-bottom: 1px solid var(--pwc-border);
   position: relative;
 }
 
@@ -368,7 +368,7 @@ code, pre {
   font-family: 'Playfair Display', serif;
   font-size: 2.6rem;
   font-weight: 700;
-  color: var(--pwc-warm);
+  color: var(--pwc-charcoal);
   line-height: 1.2;
   margin-bottom: 0.75rem;
 }
@@ -377,7 +377,7 @@ code, pre {
   font-family: 'Nunito Sans', sans-serif;
   font-size: 1.05rem;
   font-weight: 400;
-  color: rgba(255,255,255,0.80);
+  color: var(--pwc-text);
   max-width: 680px;
   margin: 0 auto;
   line-height: 1.6;
@@ -607,7 +607,7 @@ code, pre {
 
 /* CTA banner */
 .pwc-cta {
-  background: linear-gradient(135deg, var(--pwc-charcoal) 0%, var(--pwc-navy) 50%, #0a1a40 100%);
+  background: linear-gradient(135deg, var(--pwc-sage), var(--pwc-sage-dark) 40%, var(--pwc-rose-dark) 70%, var(--pwc-rose));
   padding: 3rem 2rem;
   text-align: center;
   border-radius: 12px;
@@ -664,8 +664,8 @@ code, pre {
   margin: 0.75rem 0 0;
   padding: 0.75rem 0.9rem;
   border-radius: 8px;
-  background: rgba(196, 18, 48, 0.12);
-  border: 1px solid rgba(196, 18, 48, 0.30);
+  background: rgba(196, 120, 138, 0.20);
+  border: 1px solid rgba(196, 120, 138, 0.35);
   color: rgba(255,255,255,0.9);
   font-size: 0.95rem;
 }
@@ -728,8 +728,8 @@ code, pre {
 
 /* Logged-in RSVP banner */
 .pwc-rsvp-user-banner {
-  background: rgba(27,58,156,0.12);
-  border: 1px solid rgba(27,58,156,0.30);
+  background: rgba(122,142,107,0.2);
+  border: 1px solid rgba(122,142,107,0.4);
   border-radius: 8px;
   padding: 0.5rem 0.85rem;
   margin-bottom: 0.75rem;
@@ -794,10 +794,7 @@ code, pre {
   align-items: center;
   justify-content: center;
   padding: 3rem 1rem;
-  background:
-    radial-gradient(ellipse at 30% 60%, rgba(27,58,156,0.45) 0%, transparent 55%),
-    radial-gradient(ellipse at 70% 35%, rgba(196,18,48,0.25) 0%, transparent 50%),
-    linear-gradient(160deg, var(--pwc-charcoal) 0%, var(--pwc-navy) 60%, #0a1430 100%);
+  background: linear-gradient(135deg, var(--pwc-sage-light) 0%, var(--pwc-cream) 50%, var(--pwc-rose-light) 100%);
 }
 
 .login-card {
@@ -822,14 +819,13 @@ code, pre {
   justify-content: center;
   width: 62px; height: 62px;
   border-radius: 14px;
-  background: var(--pwc-warm);
+  background: linear-gradient(135deg, var(--pwc-sage), var(--pwc-rose));
   font-family: 'Playfair Display', serif;
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--pwc-charcoal);
+  color: var(--pwc-white);
   margin-bottom: 1rem;
   letter-spacing: 0.03em;
-  box-shadow: 0 4px 16px rgba(196,146,27,0.35);
 }
 
 .login-brand h1 {
@@ -893,7 +889,7 @@ code, pre {
 .form__input:focus {
   outline: none;
   border-color: var(--pwc-sage);
-  box-shadow: 0 0 0 3px rgba(27,58,156,0.18);
+  box-shadow: 0 0 0 3px rgba(122,142,107,0.18);
 }
 
 .form__input.has-content { color: var(--pwc-charcoal); }
@@ -1017,25 +1013,25 @@ code, pre {
   display: flex;
   align-items: center;
   height: 52px;
-  background: var(--pwc-charcoal);
-  border-bottom: 1px solid rgba(196,146,27,0.22);
+  background: var(--pwc-white);
+  border-bottom: 1px solid var(--pwc-border);
   padding: 0 1.5rem;
   gap: 1rem;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.30);
+  box-shadow: var(--pwc-shadow-sm);
 }
 
 .pwc-topbar-brand {
   font-family: 'Playfair Display', serif;
   font-size: 1rem;
   font-weight: 700;
-  color: var(--pwc-warm);
+  color: var(--pwc-charcoal);
   letter-spacing: 0.05em;
   flex-shrink: 0;
   padding-right: 1rem;
-  border-right: 1px solid rgba(196,146,27,0.25);
+  border-right: 1px solid var(--pwc-border);
 }
 
 .pwc-topbar-tabs { display: flex; gap: 0.25rem; flex: 1; }
@@ -1051,16 +1047,16 @@ code, pre {
   font-family: 'Nunito Sans', sans-serif;
   font-size: 0.85rem;
   font-weight: 600;
-  color: rgba(255,255,255,0.65);
+  color: var(--pwc-muted);
   cursor: pointer;
   position: relative;
   transition: background 0.18s, color 0.18s;
 }
 
-.pwc-topbar-tab:hover { background: rgba(255,255,255,0.10); color: var(--pwc-white); }
+.pwc-topbar-tab:hover { background: var(--pwc-sage-light); color: var(--pwc-sage-dark); }
 
 .pwc-topbar-tab.active {
-  background: var(--pwc-warm);
+  background: linear-gradient(135deg, var(--pwc-sage-light), var(--pwc-rose-light));
   color: var(--pwc-charcoal);
   font-weight: 700;
 }
@@ -1090,14 +1086,14 @@ code, pre {
   font-family: 'Nunito Sans', sans-serif;
   font-size: 0.82rem;
   font-weight: 600;
-  color: rgba(255,255,255,0.80);
+  color: var(--pwc-text);
 }
 
 .pwc-topbar-avatar {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--pwc-warm), #e0a820);
+  background: linear-gradient(135deg, var(--pwc-sage), var(--pwc-rose));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1142,8 +1138,8 @@ code, pre {
 
 /* Sidebar */
 .pwc-sidebar {
-  background: var(--pwc-navy);
-  border-right: 1px solid rgba(196,146,27,0.20);
+  background: var(--pwc-cream);
+  border-right: 1px solid var(--pwc-border);
   padding: 2rem 1.25rem;
   display: flex;
   flex-direction: column;
@@ -1158,26 +1154,25 @@ code, pre {
 .pwc-avatar-ring {
   width: 80px; height: 80px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--pwc-warm), #e0a820);
+  background: linear-gradient(135deg, var(--pwc-sage), var(--pwc-rose));
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 0.25rem;
   flex-shrink: 0;
-  box-shadow: 0 0 0 3px rgba(196,146,27,0.25);
 }
 
 .pwc-avatar {
   width: 72px; height: 72px;
   border-radius: 50%;
-  background: var(--pwc-navy);
+  background: var(--pwc-cream);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: 'Playfair Display', serif;
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--pwc-warm);
+  color: var(--pwc-charcoal);
   overflow: hidden;
   position: relative;
 }
@@ -1201,12 +1196,12 @@ code, pre {
 }
 
 .pwc-btn-danger-outline {
-  border-color: rgba(196, 18, 48, 0.65) !important;
+  border-color: rgba(180, 80, 90, 0.65) !important;
   color: var(--pwc-rose-dark) !important;
 }
 
 .pwc-btn-danger-outline:hover {
-  background: rgba(196, 18, 48, 0.08) !important;
+  background: rgba(180, 80, 90, 0.08) !important;
 }
 
 /* Avatar crop modal (Cropper.js) */
@@ -1239,14 +1234,14 @@ code, pre {
   font-family: 'Playfair Display', serif;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--pwc-white);
+  color: var(--pwc-charcoal);
   text-align: center;
 }
 
 .pwc-sidebar-email {
   font-family: 'Nunito Sans', sans-serif;
   font-size: 0.72rem;
-  color: rgba(255,255,255,0.50);
+  color: var(--pwc-muted);
   text-align: center;
   word-break: break-word;
   margin-bottom: 0.75rem;
@@ -1270,16 +1265,16 @@ code, pre {
   font-family: 'Nunito Sans', sans-serif;
   font-size: 0.85rem;
   font-weight: 600;
-  color: rgba(255,255,255,0.75);
+  color: var(--pwc-text);
   text-align: left;
   cursor: pointer;
   transition: background 0.18s, color 0.18s;
 }
 
-.pwc-sidenav-btn:hover { background: rgba(255,255,255,0.10); color: var(--pwc-white); }
+.pwc-sidenav-btn:hover { background: var(--pwc-sage-light); color: var(--pwc-sage-dark); }
 
 .pwc-sidenav-btn.active {
-  background: var(--pwc-warm);
+  background: linear-gradient(135deg, var(--pwc-sage-light), var(--pwc-rose-light));
   color: var(--pwc-charcoal);
   font-weight: 700;
 }
@@ -1287,13 +1282,13 @@ code, pre {
 .pwc-logout-btn {
   margin-top: auto;
   padding: 0.55rem 1.2rem;
-  border: 1.5px solid rgba(196,18,48,0.55);
+  border: 1.5px solid var(--pwc-rose);
   border-radius: 6px;
   background: none;
   font-family: 'Nunito Sans', sans-serif;
   font-size: 0.8rem;
   font-weight: 600;
-  color: rgba(252,232,236,0.85);
+  color: var(--pwc-rose-dark);
   cursor: pointer;
   transition: background 0.18s, color 0.18s;
   width: 100%;
@@ -2081,7 +2076,7 @@ code, pre {
   cursor: pointer;
 }
 #pwc-events-calendar .fc-daygrid-day:not(.fc-day-other):hover {
-  background: rgba(196, 18, 48, 0.07) !important;
+  background: rgba(196, 120, 138, 0.07) !important;
 }
 
 /* ─── 7b. BLOG ─────────────────────────────────────────────────────────────── */
@@ -2187,7 +2182,7 @@ code, pre {
 .pwc-blog-search:focus {
   outline: none;
   border-color: var(--pwc-sage);
-  box-shadow: 0 0 0 3px rgba(27,58,156,0.12);
+  box-shadow: 0 0 0 3px rgba(122,142,107,0.12);
 }
 .pwc-blog-filters {
   display: flex;
@@ -2488,7 +2483,7 @@ code, pre {
 .pwc-blog-comment-form textarea:focus {
   outline: none;
   border-color: var(--pwc-sage);
-  box-shadow: 0 0 0 3px rgba(27,58,156,0.12);
+  box-shadow: 0 0 0 3px rgba(122,142,107,0.12);
 }
 .pwc-blog-comment-form .pwc-btn { align-self: flex-end; }
 
@@ -2549,7 +2544,7 @@ code, pre {
 .pwc-blog-field textarea:focus {
   outline: none;
   border-color: var(--pwc-sage);
-  box-shadow: 0 0 0 3px rgba(27,58,156,0.12);
+  box-shadow: 0 0 0 3px rgba(122,142,107,0.12);
 }
 .pwc-blog-field textarea { resize: vertical; }
 
@@ -2921,7 +2916,7 @@ code, pre {
 }
 .pwc-friends-search:focus {
   border-color: var(--pwc-sage);
-  box-shadow: 0 0 0 3px rgba(27,58,156,0.15);
+  box-shadow: 0 0 0 3px rgba(122,142,107,0.15);
 }
 
 .pwc-friends-search-results {
